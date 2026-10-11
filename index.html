@@ -200,6 +200,12 @@
       font-size: 13px;
       color: #cbd5e1;
     }
+    .header-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
     .prof-btn {
       background: rgba(255,255,255,0.14);
       color: white;
@@ -219,6 +225,36 @@
       color: #111827;
       border-color: #f59e0b;
     }
+    .coord-btn {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      color: #ffffff;
+      border: 1px solid #fbbf24;
+      padding: 9px 16px;
+      border-radius: 8px;
+      font-weight: 800;
+      font-size: 13.5px;
+      cursor: pointer;
+      transition: 0.2s;
+      box-shadow: 0 2px 8px rgba(217, 119, 6, 0.35);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .coord-btn:hover {
+      background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+      transform: translateY(-1px);
+    }
+    .coord-btn.unlocked {
+      background: #10b981;
+      border-color: #34d399;
+      color: white;
+      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.35);
+    }
+    .ann-item.salle {
+      border-left-color: #9333ea;
+      background: #faf5ff;
+    }
+    .badge.salle { background: #f3e8ff; color: #7e22ce; }
 
     /* MAIN CONTAINER */
     .container {
@@ -627,13 +663,98 @@
         <h1 class="brand-title" style="margin:0;font-size:19px;font-weight:800;">⚖️ Licence : Droit Privé et Transformation Digitale</h1>
         <p class="brand-sub" style="margin:2px 0 0 0;font-size:13px;color:#cbd5e1;">Faculté des Sciences Juridiques et Politiques (FSJP) — El Kelaâ des Sraghna · Université Cadi Ayyad</p>
       </div>
-      <button id="profAccessBtn" class="prof-btn" onclick="handleProfButtonClick()">
-        🔒 Accès Professeur
-      </button>
+      <div class="header-actions">
+        <button id="coordAccessBtn" class="coord-btn" onclick="handleCoordButtonClick()">
+          👑 Espace Délégué (Salah)
+        </button>
+        <button id="profAccessBtn" class="prof-btn" onclick="handleProfButtonClick()">
+          🔒 Accès Professeur
+        </button>
+      </div>
     </div>
   </header>
 
   <div class="container">
+
+    <!-- COORDINATOR PROTECTED PANEL (Délégué de la Promotion) -->
+    <div id="coordPanel" class="box" style="display:none;border:2px solid #d97706;background:#fffbeb;box-shadow:0 4px 15px rgba(217,119,6,0.12);">
+      <div class="box-header">
+        <div>
+          <div class="box-title" style="color:#b45309;font-size:18px;">
+            👑 Espace Délégué & Coordinateur de la Promotion — <span id="coordWelcomeName">Salah Boulafaa</span>
+          </div>
+          <p style="font-size:12.5px;color:#78350f;margin-top:2px;">
+            Espace officiel pour diffuser aux étudiants les consignes transmises par les professeurs (Cours maintenu, absence, rattrapage, changement de salle).
+          </p>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn-delete" style="background:#fef3c7;color:#92400e;border:1px solid #f59e0b;" onclick="downloadUpdatedSiteHtml()">💾 Exporter MAJ pour GitHub</button>
+          <button class="btn-delete" onclick="logoutCoord()">Déconnexion</button>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(320px, 1fr));gap:16px;">
+        <!-- Formulaire de Publication Délégué -->
+        <div class="sub-panel" style="background:white;padding:16px;border-radius:10px;border:1px solid #fde68a;">
+          <h3 style="font-size:15px;color:#92400e;margin-bottom:12px;">📢 Diffuser une Annonce Officielle</h3>
+          <form onsubmit="submitCoordAnnouncement(event)">
+            <label style="font-size:12px;font-weight:700;color:#475569;display:block;margin-bottom:4px;">1. Professeur ou Source de la consigne :</label>
+            <select id="coordSourceSelect" onchange="onCoordSourceChange()" style="font-weight:600;">
+              <option value="Pr. LHAROUAL MOHAMED" data-module="s5-m1" data-schedule="Lundi à 13h00 (Salle 8)">Pr. LHAROUAL MOHAMED (Droit des affaires)</option>
+              <option value="Pr. RAHMOUNE NOUHA" data-module="s5-m5" data-schedule="Lundi à 14h30 (Salle 5)">Pr. RAHMOUNE NOUHA (Droit du travail numérique)</option>
+              <option value="Pr. CHAKIR MOHAMED" data-module="s5-m6" data-schedule="Lundi à 16h00 (Salle 5)">Pr. CHAKIR MOHAMED (Gouvernance et éthique du numérique)</option>
+              <option value="Pr. BOUSSETTA FATIM EZZAHRA" data-module="s5-m4" data-schedule="Mercredi à 11h30 (Salle 5)">Pr. BOUSSETTA FATIM EZZAHRA (Droit du commerce électronique)</option>
+              <option value="Pr. ASSEMAHLI SOUKAINA" data-module="s5-m2" data-schedule="Jeudi à 16h00 (Salle 2BIS)">Pr. ASSEMAHLI SOUKAINA (Droit processuel)</option>
+              <option value="Pr. BEYYOUDH MED SAMI" data-module="s5-m3" data-schedule="Jeudi à 17h30 (Salle 2BIS)">Pr. BEYYOUDH MED SAMI (Droit des contrats numériques)</option>
+              <option value="Administration FSJP El Kelaâ" data-module="ALL" data-schedule="Avis Administratif">Administration FSJP El Kelaâ</option>
+              <option value="Salah Boulafaa (Délégué de Promotion)" data-module="ALL" data-schedule="Avis Général Promo">Coordination de la Promotion (Délégué)</option>
+            </select>
+
+            <label style="font-size:12px;font-weight:700;color:#475569;display:block;margin-bottom:4px;">2. Module / Matière concernée :</label>
+            <select id="coordModuleSelect"></select>
+
+            <label style="font-size:12px;font-weight:700;color:#475569;display:block;margin-bottom:4px;">3. Statut de la séance (Wach ghda 9aryin ?) :</label>
+            <select id="coordStatusSelect" onchange="updateWhatsAppPreview()">
+              <option value="present">🟢 Cours maintenu (9aryin f l-wa9t m3a l-prof)</option>
+              <option value="absent">🔴 Cours reporté / absent (Ma-9aryinch)</option>
+              <option value="rattrapage">🟠 Séance de rattrapage (Rattrapage programmé)</option>
+              <option value="salle">🟣 Changement de salle ou d'horaire</option>
+              <option value="info">🔵 Information générale / Avis important</option>
+            </select>
+
+            <label style="font-size:12px;font-weight:700;color:#475569;display:block;margin-bottom:4px;">4. Séance / Jour & Salle :</label>
+            <input type="text" id="coordDateInput" value="Lundi à 13h00 (Salle 8)" placeholder="Ex: Lundi 13h00 (Salle 8)" oninput="updateWhatsAppPreview()" required />
+
+            <label style="font-size:12px;font-weight:700;color:#475569;display:block;margin-bottom:4px;">5. Message officiel pour les étudiants :</label>
+            <textarea id="coordMessageInput" rows="3" placeholder="Ex: Le professeur m'a chargé de vous informer que la séance aura lieu comme prévu..." oninput="updateWhatsAppPreview()" required></textarea>
+
+            <button type="submit" class="btn-submit" style="background:#b45309;">📢 Diffuser l'annonce sur le site</button>
+          </form>
+        </div>
+
+        <!-- Outil WhatsApp pour le groupe de classe -->
+        <div class="sub-panel" style="background:white;padding:16px;border-radius:10px;border:1px solid #fed7aa;display:flex;flex-direction:column;justify-content:space-between;">
+          <div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+              <h3 style="font-size:15px;color:#16a34a;">💬 Formateur Message WhatsApp Promo</h3>
+              <span style="font-size:11px;background:#dcfce7;color:#166534;padding:2px 8px;border-radius:10px;font-weight:700;">Automatique</span>
+            </div>
+            <p style="font-size:12px;color:var(--muted);margin-bottom:8px;">
+              Formaté avec style et emojis pour être partagé immédiatement dans le groupe WhatsApp de notre promotion :
+            </p>
+            <textarea id="whatsappOutput" rows="9" readonly style="font-family:monospace;font-size:12px;background:#f8fafc;border:1px dashed #cbd5e1;padding:10px;line-height:1.45;resize:none;color:#1e293b;"></textarea>
+          </div>
+          <div style="margin-top:12px;">
+            <button type="button" class="btn-submit" onclick="copyWhatsAppMessage()" style="background:#16a34a;display:flex;align-items:center;justify-content:center;gap:6px;">
+              📋 Copier pour WhatsApp
+            </button>
+            <div id="copySuccessMsg" style="display:none;color:#16a34a;font-size:12px;font-weight:700;margin-top:6px;text-align:center;">
+              ✅ Message copié ! Tu peux le coller direct f l-groupe WhatsApp.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- PROFESSOR PROTECTED PANEL (Hidden until secret code is entered) -->
     <div id="profPanel" class="box prof-panel">
@@ -895,6 +1016,26 @@
 
   </div>
 
+  <!-- MODAL CODE SECRET COORDINATEUR / DÉLÉGUÉ -->
+  <div id="coordLoginModal" class="modal-backdrop">
+    <div class="modal-card" style="border-top:5px solid #d97706;">
+      <h3 style="font-size:17px;margin-bottom:6px;color:#b45309;">👑 Accès Délégué de Promotion & Coordination</h3>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:14px;">
+        Entrez votre code secret de Délégué pour publier et gérer les annonces de cours transmises par les professeurs.
+      </p>
+      <form onsubmit="submitCoordLogin(event)">
+        <input type="password" id="coordSecretCodeInput" placeholder="Code secret (ex: SALAH2026)" required />
+        <div id="coordLoginError" style="color:var(--red);font-size:12.5px;margin-bottom:8px;display:none;">
+          ❌ Code secret incorrect. Seul le délégué de la promotion autorisé peut accéder.
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button type="button" onclick="closeCoordLoginModal()" style="flex:1;padding:10px;border-radius:8px;border:1px solid var(--border);background:white;cursor:pointer;font-weight:700;">Annuler</button>
+          <button type="submit" class="btn-submit" style="flex:1;background:#b45309;">Connexion Délégué</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- MODAL CODE SECRET PROFESSEUR -->
   <div id="loginModal" class="modal-backdrop">
     <div class="modal-card">
@@ -934,6 +1075,17 @@
     ];
 
     const DEFAULT_ANNOUNCEMENTS = [
+      {
+        id: 100,
+        module_id: "ALL",
+        prof_name: "Salah Boulafaa",
+        is_coord: true,
+        prof_source: "Coordination de la Promotion",
+        status_type: "info",
+        date_label: "Avis Officiel · Année 2026-2027",
+        message: "Bienvenue à tous les étudiants de notre promotion ! Cet espace est dédié aux annonces officielles de la Licence transmises par les professeurs (cours maintenus, absences, rattrapages et salles).",
+        created_at: "Délégué Salah Boulafaa"
+      },
       { id: 1, module_id: "s5-m1", prof_name: "Pr. LHAROUAL MOHAMED", status_type: "present", date_label: "🟢 Lundi 12/10/2026 à 13h00 (Salle 8)", message: "Bienvenue aux étudiants de la Licence d'Excellence Droit Privé et Transformation Digitale. La première séance de Droit des affaires aura lieu le Lundi à 13h00 en Salle 8.", created_at: "Officiel FSJP" },
       { id: 2, module_id: "s5-m3", prof_name: "Pr. BEYYOUDH MED SAMI", status_type: "present", date_label: "🟢 Jeudi 17h30 (Salle 2BIS)", message: "La séance de Droit des contrats numériques est programmée chaque Jeudi de 17h30 à 19h00 en Salle 2BIS.", created_at: "Officiel FSJP" }
     ];
@@ -950,6 +1102,30 @@
     let currentTab = 'S5';
     let selectedModuleId = 's5-m1';
     let profSession = null;
+    let coordSession = null;
+
+    function saveStoredAnnouncements() {
+      try {
+        localStorage.setItem('lexdigit_announcements', JSON.stringify(appState.announcements));
+      } catch(e) {}
+    }
+
+    function loadStoredAnnouncements() {
+      try {
+        const raw = localStorage.getItem('lexdigit_announcements');
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            const map = new Map();
+            parsed.forEach(item => map.set(item.id, item));
+            DEFAULT_ANNOUNCEMENTS.forEach(item => {
+              if (!map.has(item.id)) map.set(item.id, item);
+            });
+            appState.announcements = Array.from(map.values()).sort((a,b) => (b.id || 0) - (a.id || 0));
+          }
+        }
+      } catch(e) {}
+    }
 
     async function fetchState() {
       try {
@@ -1011,25 +1187,41 @@
         present: '🟢 Cours maintenu (9aryin)',
         absent: '🔴 Cours reporté / absent',
         rattrapage: '🟠 Rattrapage',
+        salle: '🟣 Changement de salle',
         info: '🔵 Information'
       };
 
       container.innerHTML = appState.announcements.map(a => {
-        const mod = appState.modules.find(m => m.id === a.module_id);
-        const modTitle = mod ? mod.title : 'Général';
-        const delBtn = profSession
+        let modTitle = 'Toute la Promotion';
+        if (a.module_id && a.module_id !== 'ALL') {
+          const mod = appState.modules.find(m => m.id === a.module_id);
+          if (mod) modTitle = mod.title;
+        }
+
+        const canDelete = profSession || coordSession;
+        const delBtn = canDelete
           ? `<button class="btn-delete" onclick="deleteAnnouncement(${a.id})">Supprimer</button>`
           : '';
+
+        const coordBadge = a.is_coord
+          ? `<span class="badge" style="background:#fef3c7;color:#92400e;border:1px solid #f59e0b;">👑 Avis Délégué · Salah Boulafaa</span>`
+          : '';
+
+        const sourceText = a.prof_source
+          ? `Transmis par <strong>${a.prof_source}</strong>`
+          : `Par <strong>${a.prof_name}</strong>`;
+
         return `
           <div class="ann-item ${a.status_type || 'info'}">
-            <div>
-              <div style="margin-bottom:4px;">
+            <div style="flex:1;">
+              <div style="margin-bottom:6px;display:flex;align-items:center;flex-wrap:wrap;gap:6px;">
                 <span class="badge ${a.status_type || 'info'}">${statusLabels[a.status_type] || 'Info'}</span>
-                <strong style="font-size:13.5px;">${modTitle}</strong>
+                ${coordBadge}
+                <strong style="font-size:13.5px;color:var(--primary);">${modTitle}</strong>
                 <span style="font-size:12px;color:var(--muted);"> · ${a.date_label}</span>
               </div>
-              <div style="font-size:14px;margin-bottom:3px;">${a.message}</div>
-              <div style="font-size:11.5px;color:var(--muted);">Par <strong>${a.prof_name}</strong> · ${a.created_at}</div>
+              <div style="font-size:14px;margin-bottom:5px;line-height:1.5;">${a.message}</div>
+              <div style="font-size:11.5px;color:var(--muted);">${sourceText} · ${a.created_at}</div>
             </div>
             ${delBtn}
           </div>
@@ -1138,20 +1330,260 @@
       document.getElementById('loginModal').style.display = 'none';
     }
 
+    const CLIENT_PROF_CODES = {
+      "SALAH2026": { prof_name: "Salah Boulafaa (Délégué)", role: "coordinator", is_coord: true, module_id: "ALL" },
+      "COORD2026": { prof_name: "Salah Boulafaa (Délégué)", role: "coordinator", is_coord: true, module_id: "ALL" },
+      "DELEGUE2026": { prof_name: "Salah Boulafaa (Délégué)", role: "coordinator", is_coord: true, module_id: "ALL" },
+      "FSJP2026": { prof_name: "Pr. LHAROUAL MOHAMED (Coordonnateur)", module_id: "s5-m1" },
+      "LHAROUAL2026": { prof_name: "Pr. LHAROUAL MOHAMED", module_id: "s5-m1" },
+      "ASSEMAHLI2026": { prof_name: "Pr. ASSEMAHLI SOUKAINA", module_id: "s5-m2" },
+      "BEYYOUDH2026": { prof_name: "Pr. BEYYOUDH MED SAMI", module_id: "s5-m3" },
+      "BOUSSETTA2026": { prof_name: "Pr. BOUSSETTA FATIM EZZAHRA", module_id: "s5-m4" },
+      "RAHMOUNE2026": { prof_name: "Pr. RAHMOUNE NOUHA", module_id: "s5-m5" },
+      "CHAKIR2026": { prof_name: "Pr. CHAKIR MOHAMED", module_id: "s5-m6" },
+    };
+
+    function handleCoordButtonClick() {
+      if (coordSession) {
+        const panel = document.getElementById('coordPanel');
+        panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+        return;
+      }
+      document.getElementById('coordLoginError').style.display = 'none';
+      document.getElementById('coordSecretCodeInput').value = '';
+      document.getElementById('coordLoginModal').style.display = 'flex';
+    }
+
+    function closeCoordLoginModal() {
+      document.getElementById('coordLoginModal').style.display = 'none';
+    }
+
+    async function submitCoordLogin(e) {
+      e.preventDefault();
+      const code = document.getElementById('coordSecretCodeInput').value.trim().toUpperCase();
+      let data = null;
+
+      try {
+        const res = await fetch('/api/prof/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code })
+        });
+        if (res.ok) data = await res.json();
+      } catch (err) {}
+
+      if (!data && CLIENT_PROF_CODES[code]) {
+        data = { ok: true, ...CLIENT_PROF_CODES[code] };
+      }
+
+      if (!data || !data.ok) {
+        document.getElementById('coordLoginError').style.display = 'block';
+        return;
+      }
+
+      document.getElementById('coordLoginError').style.display = 'none';
+      coordSession = {
+        code: code,
+        name: data.prof_name || "Salah Boulafaa",
+        role: "coordinator"
+      };
+      closeCoordLoginModal();
+
+      const btn = document.getElementById('coordAccessBtn');
+      btn.classList.add('unlocked');
+      btn.textContent = `👑 Espace Délégué (${coordSession.name})`;
+
+      document.getElementById('coordWelcomeName').textContent = coordSession.name;
+      document.getElementById('coordPanel').style.display = 'block';
+
+      populateCoordSelects();
+      onCoordSourceChange();
+      renderAnnouncements();
+    }
+
+    function logoutCoord() {
+      coordSession = null;
+      document.getElementById('coordPanel').style.display = 'none';
+      const btn = document.getElementById('coordAccessBtn');
+      btn.classList.remove('unlocked');
+      btn.textContent = '👑 Espace Délégué (Salah)';
+      renderAnnouncements();
+    }
+
+    function populateCoordSelects() {
+      let options = `<option value="ALL">📢 [GÉNÉRAL] Toute la Promotion (Toutes les matières)</option>`;
+      options += appState.modules.map(m =>
+        `<option value="${m.id}">[${m.semester}] ${m.title} (${m.professor})</option>`
+      ).join('');
+      const el = document.getElementById('coordModuleSelect');
+      if (el) el.innerHTML = options;
+    }
+
+    function onCoordSourceChange() {
+      const srcSelect = document.getElementById('coordSourceSelect');
+      if (!srcSelect) return;
+      const opt = srcSelect.options[srcSelect.selectedIndex];
+      const modId = opt ? opt.getAttribute('data-module') : 'ALL';
+      const sched = opt ? opt.getAttribute('data-schedule') : '';
+      
+      const modSelect = document.getElementById('coordModuleSelect');
+      if (modSelect) {
+        if (modId && modId !== 'ALL') {
+          modSelect.value = modId;
+        } else {
+          modSelect.value = 'ALL';
+        }
+      }
+      
+      const dateInp = document.getElementById('coordDateInput');
+      if (dateInp && sched) {
+        dateInp.value = sched;
+      }
+      updateWhatsAppPreview();
+    }
+
+    function updateWhatsAppPreview() {
+      const srcSelect = document.getElementById('coordSourceSelect');
+      if (!srcSelect) return;
+      const src = srcSelect.value;
+      const modSel = document.getElementById('coordModuleSelect');
+      const modTitle = modSel && modSel.selectedIndex >= 0 ? modSel.options[modSel.selectedIndex].text : 'Licence Droit Privé & Transformation Digitale';
+      const status = document.getElementById('coordStatusSelect').value;
+      const dateVal = document.getElementById('coordDateInput').value.trim();
+      const msgVal = document.getElementById('coordMessageInput').value.trim();
+
+      const statusIcons = {
+        present: '🟢 *COURS MAINTENU (9ARYIN F L-WA9T)*',
+        absent: '🔴 *COURS REPORTÉ / ABSENCE DU PROFESSEUR (MA-9ARYINCH)*',
+        rattrapage: '🟠 *SÉANCE DE RATTRAPAGE PROGRAMMÉE*',
+        salle: '🟣 *CHANGEMENT DE SALLE OU D\'HORAIRE*',
+        info: '🔵 *INFORMATION OFFICIELLE & AVIS IMPORTANT*'
+      };
+
+      const statusHeader = statusIcons[status] || '📢 *AVIS DE LA COORDINATION*';
+
+      const waText = 
+`📢 *AVIS OFFICIEL DE LA COORDINATION*
+⚖️ *Licence : Droit Privé et Transformation Digitale (2026-2027)*
+📍 *FSJP El Kelaâ des Sraghna — UCA*
+────────────────────────
+📌 *Statut :* ${statusHeader}
+👨‍🏫 *Professeur :* ${src}
+📚 *Matière :* ${modTitle}
+🕒 *Séance :* ${dateVal || 'À préciser'}
+
+📝 *Détails / Consigne :*
+${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
+────────────────────────
+👑 *Délégué de la Promotion :* Salah Boulafaa
+🌐 *Plateforme Officielle :* https://salahboulafaa34-hue.github.io/lexdigit-uca-/`;
+
+      const out = document.getElementById('whatsappOutput');
+      if (out) out.value = waText;
+    }
+
+    function copyWhatsAppMessage() {
+      const out = document.getElementById('whatsappOutput');
+      if (!out || !out.value) return;
+      navigator.clipboard.writeText(out.value).then(() => {
+        const msg = document.getElementById('copySuccessMsg');
+        if (msg) {
+          msg.style.display = 'block';
+          setTimeout(() => { msg.style.display = 'none'; }, 4000);
+        }
+      }).catch(() => {
+        out.select();
+        document.execCommand('copy');
+        const msg = document.getElementById('copySuccessMsg');
+        if (msg) {
+          msg.style.display = 'block';
+          setTimeout(() => { msg.style.display = 'none'; }, 4000);
+        }
+      });
+    }
+
+    async function submitCoordAnnouncement(e) {
+      e.preventDefault();
+      if (!coordSession) return;
+      const src = document.getElementById('coordSourceSelect').value;
+      const modId = document.getElementById('coordModuleSelect').value;
+      const status = document.getElementById('coordStatusSelect').value;
+      const dateVal = document.getElementById('coordDateInput').value.trim();
+      const msgVal = document.getElementById('coordMessageInput').value.trim();
+
+      const payload = {
+        id: Date.now(),
+        access_code: coordSession.code,
+        prof_name: coordSession.name,
+        prof_source: src,
+        is_coord: true,
+        module_id: modId,
+        status_type: status,
+        date_label: dateVal,
+        message: msgVal,
+        created_at: "Délégué Salah Boulafaa · À l'instant"
+      };
+
+      try {
+        await fetch('/api/announcements', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+      } catch (err) {}
+
+      appState.announcements.unshift(payload);
+      saveStoredAnnouncements();
+      renderAnnouncements();
+      document.getElementById('coordMessageInput').value = '';
+      updateWhatsAppPreview();
+      alert("✅ L'annonce a été publiée avec succès sur la plateforme !");
+    }
+
+    function downloadUpdatedSiteHtml() {
+      const currentDocHtml = document.documentElement.outerHTML;
+      const annJson = JSON.stringify(appState.announcements, null, 2);
+      const replaced = currentDocHtml.replace(
+        /const DEFAULT_ANNOUNCEMENTS = \[[\s\S]*?\];/,
+        `const DEFAULT_ANNOUNCEMENTS = ${annJson};`
+      );
+      const blob = new Blob([replaced], { type: 'text/html;charset=utf-8' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'index.html';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      alert("✅ Fichier 'index.html' téléchargé avec succès ! Tu peux le glisser-déposer sur GitHub pour mettre le site à jour pour tous les étudiants.");
+    }
+
     async function submitProfLogin(e) {
       e.preventDefault();
-      const code = document.getElementById('profSecretCodeInput').value.trim();
-      const res = await fetch('/api/prof/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code })
-      });
-      const data = await res.json();
-      if (!res.ok || !data.ok) {
+      const code = document.getElementById('profSecretCodeInput').value.trim().toUpperCase();
+      let data = null;
+
+      try {
+        const res = await fetch('/api/prof/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code })
+        });
+        if (res.ok) {
+          data = await res.json();
+        }
+      } catch (err) {}
+
+      // Fallback officiel pour GitHub Pages
+      if (!data && CLIENT_PROF_CODES[code]) {
+        data = { ok: true, ...CLIENT_PROF_CODES[code] };
+      }
+
+      if (!data || !data.ok) {
         document.getElementById('loginError').style.display = 'block';
         return;
       }
 
+      document.getElementById('loginError').style.display = 'none';
       profSession = {
         code: code,
         prof_name: data.prof_name,
@@ -1197,25 +1629,36 @@
         date_label: document.getElementById('annDateLabel').value.trim(),
         message: document.getElementById('annMessage').value.trim()
       };
-      const res = await fetch('/api/announcements', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      if (res.ok) {
-        document.getElementById('annMessage').value = '';
-        await fetchState();
-      }
+      try {
+        await fetch('/api/announcements', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+      } catch (err) {}
+
+      // Ajout immédiat à l'interface
+      payload.id = Date.now();
+      payload.created_at = "À l'instant";
+      appState.announcements.unshift(payload);
+      saveStoredAnnouncements();
+      renderAnnouncements();
+      document.getElementById('annMessage').value = '';
     }
 
     async function deleteAnnouncement(id) {
-      if (!profSession) return;
-      await fetch('/api/announcements/delete', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id, access_code: profSession.code })
-      });
-      await fetchState();
+      if (!profSession && !coordSession) return;
+      const code = (profSession && profSession.code) || (coordSession && coordSession.code) || '';
+      try {
+        await fetch('/api/announcements/delete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id, access_code: code })
+        });
+      } catch (err) {}
+      appState.announcements = appState.announcements.filter(a => a.id !== id);
+      saveStoredAnnouncements();
+      renderAnnouncements();
     }
 
     async function submitPdfUpload(e) {
@@ -1263,22 +1706,38 @@
       const message = document.getElementById('commentMessage').value.trim();
       if (!author || !message) return;
 
-      await fetch('/api/comments', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          module_id: selectedModuleId,
-          author,
-          role: profSession ? 'prof' : 'student',
-          access_code: profSession ? profSession.code : '',
-          message
-        })
-      });
+      const newComm = {
+        id: Date.now(),
+        module_id: selectedModuleId,
+        author: author,
+        author_name: author,
+        role: profSession ? 'prof' : 'student',
+        message: message,
+        created_at: "À l'instant"
+      };
+
+      try {
+        await fetch('/api/comments', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            module_id: selectedModuleId,
+            author,
+            role: profSession ? 'prof' : 'student',
+            access_code: profSession ? profSession.code : '',
+            message
+          })
+        });
+      } catch (err) {}
+
+      appState.comments.push(newComm);
       document.getElementById('commentMessage').value = '';
-      await fetchState();
+      renderSelectedModuleWorkspace();
     }
 
     // Rendu immédiat (0ms) pour Googlebot et affichage instantané
+    loadStoredAnnouncements();
+    populateCoordSelects();
     renderAnnouncements();
     renderModules();
     renderSelectedModuleWorkspace();
