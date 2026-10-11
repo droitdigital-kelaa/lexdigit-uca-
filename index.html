@@ -521,36 +521,84 @@
       white-space: nowrap;
     }
 
-    /* COMMENTS / DISCUSSION */
+    /* COMMENTS / DISCUSSION (FORUM ÉTUDIANTS) */
     .comment-list {
-      max-height: 310px;
+      max-height: 340px;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 10px;
       margin-bottom: 12px;
+      padding-right: 4px;
     }
     .comment-item {
-      padding: 10px 12px;
-      border-radius: 8px;
+      padding: 11px 13px;
+      border-radius: 10px;
       background: white;
       border: 1px solid var(--border);
       font-size: 13px;
+      display: flex;
+      gap: 11px;
+      align-items: flex-start;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+    }
+    .comment-item.coord-comment {
+      border-left: 4px solid #d97706;
+      background: #fffbeb;
     }
     .comment-item.prof-comment {
-      border-left: 4px solid var(--accent);
-      background: #fffbeb;
+      border-left: 4px solid #1e3a8a;
+      background: #eff6ff;
+    }
+    .comment-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #e2e8f0;
+      color: #334155;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 12px;
+      flex-shrink: 0;
+    }
+    .comment-avatar.coord {
+      background: #fef3c7;
+      color: #92400e;
+      border: 1px solid #f59e0b;
+    }
+    .comment-avatar.prof {
+      background: #dbeafe;
+      color: #1e40af;
+      border: 1px solid #93c5fd;
+    }
+    .comment-content {
+      flex: 1;
+      min-width: 0;
     }
     .comment-head {
       display: flex;
       justify-content: space-between;
+      align-items: center;
       font-size: 11.5px;
       color: var(--muted);
       margin-bottom: 4px;
+      flex-wrap: wrap;
+      gap: 4px;
     }
     .comment-author {
       font-weight: 800;
       color: var(--text);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .comment-body {
+      font-size: 13.5px;
+      line-height: 1.45;
+      color: #1e293b;
+      word-break: break-word;
     }
 
     /* FORMS */
@@ -935,18 +983,35 @@
           <div id="moduleDocsList"></div>
         </div>
 
-        <!-- Right: Student & Prof Discussion -->
-        <div class="sub-panel">
-          <h3>
-            <span>💬 Discussion & Questions des Étudiants</span>
-            <span id="commentCountBadge" style="font-size:12px;color:var(--muted);">0 message(s)</span>
-          </h3>
-          <div id="moduleCommentsList" class="comment-list"></div>
+        <!-- Right: Student & Prof Discussion Forum -->
+        <div class="sub-panel" style="display:flex;flex-direction:column;justify-content:space-between;">
+          <div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:6px;">
+              <h3 style="margin:0;font-size:15px;display:flex;align-items:center;gap:6px;">
+                <span>💬 Forum & Questions des Étudiants</span>
+                <span style="font-size:11px;background:#dcfce7;color:#166534;padding:2px 7px;border-radius:10px;font-weight:700;">🟢 En Direct</span>
+              </h3>
+              <span id="commentCountBadge" style="font-size:11.5px;background:#e0f2fe;color:#0369a1;padding:2px 8px;border-radius:10px;font-weight:700;">0 message(s)</span>
+            </div>
 
-          <form onsubmit="submitComment(event)">
-            <input type="text" id="commentAuthor" placeholder="Votre Nom & Prénom" required />
-            <textarea id="commentMessage" rows="2" placeholder="Posez une question ou partagez une explication sur ce module..." required></textarea>
-            <button type="submit" class="btn-submit">Envoyer le message</button>
+            <!-- Scope Toggle: Ce Module VS Toute la Promo -->
+            <div style="display:flex;gap:6px;margin-bottom:10px;">
+              <button type="button" id="chatScopeModBtn" class="tab-btn active" style="font-size:12px;padding:6px 12px;cursor:pointer;" onclick="setChatScope('module')">📘 Ce Module</button>
+              <button type="button" id="chatScopePromoBtn" class="tab-btn" style="font-size:12px;padding:6px 12px;cursor:pointer;" onclick="setChatScope('promo')">💬 Salon Général Promo</button>
+            </div>
+
+            <div id="moduleCommentsList" class="comment-list"></div>
+          </div>
+
+          <form onsubmit="submitComment(event)" style="margin-top:10px;border-top:1px solid #e2e8f0;padding-top:10px;">
+            <div style="display:flex;gap:8px;margin-bottom:6px;">
+              <input type="text" id="commentAuthor" placeholder="Votre Nom & Prénom" style="flex:1;margin-bottom:0;" required />
+            </div>
+            <textarea id="commentMessage" rows="2" placeholder="Posez une question, partagez une information ou répondez à vos camarades..." style="margin-bottom:6px;" required></textarea>
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+              <span id="commentToast" style="font-size:12px;color:#16a34a;font-weight:700;display:none;">✅ Message envoyé et synchronisé avec succès !</span>
+              <button type="submit" class="btn-submit" style="margin-top:0;width:auto;padding:8px 18px;margin-left:auto;">Envoyer le message 🚀</button>
+            </div>
           </form>
         </div>
       </div>
@@ -1090,17 +1155,23 @@
       { id: 2, module_id: "s5-m3", prof_name: "Pr. BEYYOUDH MED SAMI", status_type: "present", date_label: "🟢 Jeudi 17h30 (Salle 2BIS)", message: "La séance de Droit des contrats numériques est programmée chaque Jeudi de 17h30 à 19h00 en Salle 2BIS.", created_at: "Officiel FSJP" }
     ];
 
+    const DEFAULT_COMMENTS = [
+      { id: "c1", module_id: "s5-m1", author: "Salah Boulafaa", role: "coord", message: "Salam les amis ! Bienvenue sur la plateforme officielle de notre promotion. Posez vos questions et partagez vos remarques ici.", created_at: "10/10/2026 à 14h00" },
+      { id: "c2", module_id: "s5-m1", author: "Pr. LHAROUAL MOHAMED", role: "prof", message: "Bienvenue à toutes et à tous. Les supports de cours PDF seront publiés directement dans chaque module.", created_at: "10/10/2026 à 16h30" },
+      { id: "c3", module_id: "ALL", author: "Salah Boulafaa", role: "coord", message: "📢 Salon Général ouvert à toute la promotion ! N'hésitez pas à poser vos questions sur l'emploi du temps ou les cours.", created_at: "11/10/2026 à 10h00" },
+      { id: "c4", module_id: "ALL", author: "Étudiant FSJP", role: "student", message: "Tbarkellah 3lik a monasi9, had l-plateforme nfa3atna bzaf bach ntb3o les cours !", created_at: "11/10/2026 à 11h15" }
+    ];
+
     let appState = {
       modules: DEFAULT_MODULES,
       announcements: DEFAULT_ANNOUNCEMENTS,
       documents: [],
-      comments: [
-        { id: 1, module_id: "s5-m1", author: "Salah B.", author_name: "Salah B.", role: "student", message: "Salam les amis, bienvenue dans l'espace officiel de notre promotion !", created_at: "10/10/2026" },
-        { id: 2, module_id: "s5-m1", author: "Pr. LHAROUAL MOHAMED", author_name: "Pr. LHAROUAL MOHAMED", role: "prof", message: "Bienvenue à toutes et à tous. Les supports de cours PDF seront publiés directement dans chaque module.", created_at: "10/10/2026" }
-      ]
+      comments: DEFAULT_COMMENTS
     };
     let currentTab = 'S5';
     let selectedModuleId = 's5-m1';
+    let chatScope = 'module';
+    const NTFY_TOPIC = 'lexdigit_uca_sraghna_forum_2026';
     let profSession = null;
     let coordSession = null;
 
@@ -1152,6 +1223,34 @@
         appState.announcements = announcements.filter(a => !deletedIds.has(String(a.id)));
         saveStoredAnnouncements();
       } catch(e) {}
+    }
+
+    function saveStoredComments() {
+      try {
+        localStorage.setItem('lexdigit_comments', JSON.stringify(appState.comments));
+      } catch(e) {}
+    }
+
+    function loadStoredComments() {
+      try {
+        const raw = localStorage.getItem('lexdigit_comments');
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            const map = new Map();
+            parsed.forEach(c => map.set(String(c.id), c));
+            DEFAULT_COMMENTS.forEach(c => {
+              if (!map.has(String(c.id))) map.set(String(c.id), c);
+            });
+            appState.comments = Array.from(map.values());
+            return;
+          }
+        }
+        appState.comments = [...DEFAULT_COMMENTS];
+        saveStoredComments();
+      } catch(e) {
+        appState.comments = [...DEFAULT_COMMENTS];
+      }
     }
 
     async function fetchState() {
@@ -1316,22 +1415,77 @@
         }).join('');
       }
 
-      const comments = appState.comments.filter(c => c.module_id === mod.id);
+      // Commentaires selon chatScope ('module' ou 'promo')
+      const isPromo = chatScope === 'promo';
+      const comments = appState.comments.filter(c => isPromo ? (c.module_id === 'ALL' || !c.module_id || c.module_id === 'promo') : (c.module_id === mod.id));
       document.getElementById('commentCountBadge').textContent = `${comments.length} message(s)`;
+
+      // Boutons Scope toggle
+      const modBtn = document.getElementById('chatScopeModBtn');
+      const promoBtn = document.getElementById('chatScopePromoBtn');
+      if (modBtn && promoBtn) {
+        modBtn.classList.toggle('active', !isPromo);
+        promoBtn.classList.toggle('active', isPromo);
+        modBtn.textContent = `📘 ${mod.title}`;
+      }
+
       const commEl = document.getElementById('moduleCommentsList');
       if (!comments.length) {
-        commEl.innerHTML = `<div style="color:var(--muted);font-size:13px;padding:12px 0;">Aucune question pour ce module. Posez la première question ci-dessous !</div>`;
+        const emptyMsg = isPromo
+          ? "Aucun message dans le salon général. Écrivez le premier mot pour vos camarades !"
+          : `Aucune question pour le module "${mod.title}". Posez votre question ci-dessous !`;
+        commEl.innerHTML = `<div style="color:var(--muted);font-size:13px;padding:24px 0;text-align:center;">${emptyMsg}</div>`;
       } else {
-        commEl.innerHTML = comments.map(c => `
-          <div class="comment-item ${c.role === 'prof' ? 'prof-comment' : ''}">
-            <div class="comment-head">
-              <span class="comment-author">${c.author} ${c.role === 'prof' ? '🎓 (Professeur)' : ''}</span>
-              <span>${c.created_at}</span>
+        commEl.innerHTML = comments.map(c => {
+          const isProf = c.role === 'prof';
+          const isCoord = c.role === 'coord';
+          
+          let roleBadge = '<span style="font-size:11px;background:#e2e8f0;color:#475569;padding:2px 6px;border-radius:4px;">🎓 Étudiant</span>';
+          let avatarClass = '';
+          let itemClass = '';
+          
+          if (isCoord) {
+            roleBadge = '<span style="font-size:11px;background:#fef3c7;color:#92400e;border:1px solid #f59e0b;padding:2px 6px;border-radius:4px;font-weight:700;">👑 Délégué Promo</span>';
+            avatarClass = 'coord';
+            itemClass = 'coord-comment';
+          } else if (isProf) {
+            roleBadge = '<span style="font-size:11px;background:#dbeafe;color:#1e40af;border:1px solid #93c5fd;padding:2px 6px;border-radius:4px;font-weight:700;">👨‍🏫 Professeur</span>';
+            avatarClass = 'prof';
+            itemClass = 'prof-comment';
+          }
+
+          // Initiales pour avatar
+          const authorName = (c.author || c.author_name || 'Étudiant').trim();
+          const words = authorName.split(' ').filter(w => w.length > 0);
+          const initials = (words[0] ? words[0][0] : 'E') + (words[1] ? words[1][0] : '');
+
+          const canDelete = profSession || coordSession;
+          const delBtn = canDelete
+            ? `<button class="btn-delete" style="font-size:11px;padding:2px 6px;margin-left:8px;" onclick="deleteComment('${c.id}')" title="Supprimer">✕</button>`
+            : '';
+
+          return `
+            <div class="comment-item ${itemClass}">
+              <div class="comment-avatar ${avatarClass}">${isCoord ? '👑' : (isProf ? '👨‍🏫' : initials.toUpperCase())}</div>
+              <div class="comment-content">
+                <div class="comment-head">
+                  <div class="comment-author">
+                    <span>${authorName}</span>
+                    ${roleBadge}
+                  </div>
+                  <div>
+                    <span>${c.created_at || "À l'instant"}</span>
+                    ${delBtn}
+                  </div>
+                </div>
+                <div class="comment-body">${c.message}</div>
+              </div>
             </div>
-            <div>${c.message}</div>
-          </div>
-        `).join('');
+          `;
+        }).join('');
       }
+
+      initStudentName();
     }
 
     function populateProfSelects() {
@@ -1739,43 +1893,144 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
       await fetchState();
     }
 
-    async function submitComment(e) {
+    function submitComment(e) {
       e.preventDefault();
-      const author = document.getElementById('commentAuthor').value.trim();
-      const message = document.getElementById('commentMessage').value.trim();
+      const authorInp = document.getElementById('commentAuthor');
+      const msgInp = document.getElementById('commentMessage');
+      const author = authorInp.value.trim();
+      const message = msgInp.value.trim();
       if (!author || !message) return;
 
+      // Mémoriser le nom de l'étudiant
+      try {
+        localStorage.setItem('lexdigit_student_name', author);
+      } catch(err){}
+
+      // Déterminer le rôle
+      let role = 'student';
+      if (coordSession) role = 'coord';
+      else if (profSession) role = 'prof';
+
+      // Déterminer la date
+      const now = new Date();
+      const hours = String(now.getHours()).padStart(2, '0');
+      const mins = String(now.getMinutes()).padStart(2, '0');
+      const day = String(now.getDate()).padStart(2, '0');
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const timeStr = `${day}/${month} à ${hours}:${mins}`;
+
+      const targetModId = chatScope === 'promo' ? 'ALL' : selectedModuleId;
+
       const newComm = {
-        id: Date.now(),
-        module_id: selectedModuleId,
+        id: 'c_' + Date.now() + '_' + Math.floor(Math.random()*1000),
+        module_id: targetModId,
         author: author,
         author_name: author,
-        role: profSession ? 'prof' : 'student',
+        role: role,
         message: message,
-        created_at: "À l'instant"
+        created_at: timeStr
       };
 
-      try {
-        await fetch('/api/comments', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            module_id: selectedModuleId,
-            author,
-            role: profSession ? 'prof' : 'student',
-            access_code: profSession ? profSession.code : '',
-            message
-          })
-        });
-      } catch (err) {}
-
+      // 1. Ajout immédiat (0ms) à l'affichage
       appState.comments.push(newComm);
-      document.getElementById('commentMessage').value = '';
+      saveStoredComments();
+      msgInp.value = '';
       renderSelectedModuleWorkspace();
+
+      // Toast de confirmation
+      const toast = document.getElementById('commentToast');
+      if (toast) {
+        toast.style.display = 'inline';
+        setTimeout(() => { toast.style.display = 'none'; }, 3000);
+      }
+
+      // 2. Publication instantanée dans le Cloud (ntfy.sh) pour tous les étudiants
+      fetch(`https://ntfy.sh/${NTFY_TOPIC}`, {
+        method: 'POST',
+        body: JSON.stringify(newComm)
+      }).catch(() => {});
+
+      // 3. Appel backend local si actif
+      fetch('/api/comments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          module_id: targetModId,
+          author,
+          role,
+          access_code: profSession ? profSession.code : (coordSession ? coordSession.code : ''),
+          message
+        })
+      }).catch(() => {});
+    }
+
+    function deleteComment(id) {
+      if (!confirm("Voulez-vous supprimer ce message ?")) return;
+      const strId = String(id);
+      appState.comments = appState.comments.filter(c => String(c.id) !== strId);
+      saveStoredComments();
+      renderSelectedModuleWorkspace();
+    }
+
+    function setChatScope(scope) {
+      chatScope = scope;
+      renderSelectedModuleWorkspace();
+    }
+
+    function initStudentName() {
+      const inp = document.getElementById('commentAuthor');
+      if (!inp) return;
+      if (coordSession) {
+        inp.value = coordSession.name + ' (Délégué)';
+        inp.readOnly = true;
+      } else if (profSession) {
+        inp.value = profSession.prof_name;
+        inp.readOnly = true;
+      } else {
+        const saved = localStorage.getItem('lexdigit_student_name');
+        if (saved && !inp.value) inp.value = saved;
+        inp.readOnly = false;
+      }
+    }
+
+    async function syncCloudComments() {
+      try {
+        const res = await fetch(`https://ntfy.sh/${NTFY_TOPIC}/json?poll=1&since=all`);
+        if (res.ok) {
+          const text = await res.text();
+          if (!text) return;
+          const lines = text.split('\n').filter(l => l.trim().length > 0);
+          let hasNew = false;
+          const map = new Map();
+          appState.comments.forEach(c => map.set(String(c.id), c));
+
+          for (const line of lines) {
+            try {
+              const item = JSON.parse(line);
+              if (item.event === 'message' && item.message) {
+                const msgObj = JSON.parse(item.message);
+                const strId = String(msgObj.id || item.id);
+                if (!map.has(strId)) {
+                  msgObj.id = strId;
+                  map.set(strId, msgObj);
+                  hasNew = true;
+                }
+              }
+            } catch(err){}
+          }
+
+          if (hasNew) {
+            appState.comments = Array.from(map.values());
+            saveStoredComments();
+            renderSelectedModuleWorkspace();
+          }
+        }
+      } catch(err) {}
     }
 
     // Rendu immédiat (0ms) pour Googlebot et affichage instantané
     loadStoredAnnouncements();
+    loadStoredComments();
     populateCoordSelects();
     renderAnnouncements();
     renderModules();
@@ -1783,7 +2038,9 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
     populateProfSelects();
 
     fetchState();
+    syncCloudComments();
     setInterval(fetchState, 10000);
+    setInterval(syncCloudComments, 8000);
   </script>
 </body>
 </html>
