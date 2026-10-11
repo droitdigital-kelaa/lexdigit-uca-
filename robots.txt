@@ -1,5 +1,4 @@
 User-agent: *
 Allow: /
-Disallow: /uploads/
 
-Sitemap: /sitemap.xml
+Sitemap: https://salahboulafaa34-hue.github.io/lexdigit-uca-/sitemap.xml
