@@ -1104,6 +1104,24 @@
     let profSession = null;
     let coordSession = null;
 
+    function getDeletedIds() {
+      try {
+        const raw = localStorage.getItem('lexdigit_deleted_announcements');
+        return raw ? JSON.parse(raw) : [];
+      } catch(e) { return []; }
+    }
+
+    function addDeletedId(id) {
+      try {
+        const deleted = getDeletedIds();
+        const strId = String(id);
+        if (!deleted.includes(strId)) {
+          deleted.push(strId);
+          localStorage.setItem('lexdigit_deleted_announcements', JSON.stringify(deleted));
+        }
+      } catch(e) {}
+    }
+
     function saveStoredAnnouncements() {
       try {
         localStorage.setItem('lexdigit_announcements', JSON.stringify(appState.announcements));
@@ -1112,18 +1130,27 @@
 
     function loadStoredAnnouncements() {
       try {
+        const deletedIds = new Set(getDeletedIds().map(String));
         const raw = localStorage.getItem('lexdigit_announcements');
+        let announcements = [];
+
         if (raw) {
-          const parsed = JSON.parse(raw);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            const map = new Map();
-            parsed.forEach(item => map.set(item.id, item));
-            DEFAULT_ANNOUNCEMENTS.forEach(item => {
-              if (!map.has(item.id)) map.set(item.id, item);
-            });
-            appState.announcements = Array.from(map.values()).sort((a,b) => (b.id || 0) - (a.id || 0));
-          }
+          try {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed)) {
+              announcements = parsed;
+            }
+          } catch(e){}
         }
+
+        // Si le stockage n'est pas encore initialisé, utiliser DEFAULT_ANNOUNCEMENTS
+        if (!raw) {
+          announcements = [...DEFAULT_ANNOUNCEMENTS];
+        }
+
+        // Filtrer toutes les annonces supprimées de façon définitive
+        appState.announcements = announcements.filter(a => !deletedIds.has(String(a.id)));
+        saveStoredAnnouncements();
       } catch(e) {}
     }
 
@@ -1200,7 +1227,7 @@
 
         const canDelete = profSession || coordSession;
         const delBtn = canDelete
-          ? `<button class="btn-delete" onclick="deleteAnnouncement(${a.id})">Supprimer</button>`
+          ? `<button class="btn-delete" onclick="deleteAnnouncement('${a.id}')">Supprimer</button>`
           : '';
 
         const coordBadge = a.is_coord
@@ -1646,19 +1673,31 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
       document.getElementById('annMessage').value = '';
     }
 
-    async function deleteAnnouncement(id) {
-      if (!profSession && !coordSession) return;
+    function deleteAnnouncement(id) {
+      if (!confirm("Voulez-vous vraiment supprimer cette annonce ?")) return;
+      const targetId = String(id);
+
+      // 1. Ajouter à la liste des annonces supprimées définitivement
+      addDeletedId(targetId);
+
+      // 2. Supprimer immédiatement du tableau local (comparaison String sûre)
+      appState.announcements = appState.announcements.filter(a => String(a.id) !== targetId);
+      
+      // 3. Sauvegarder dans localStorage
+      saveStoredAnnouncements();
+
+      // 4. Mettre à jour l'affichage immédiatement
+      renderAnnouncements();
+
+      // 5. Envoyer la suppression au serveur (en tâche de fond sans bloquer)
       const code = (profSession && profSession.code) || (coordSession && coordSession.code) || '';
-      try {
-        await fetch('/api/announcements/delete', {
+      if (code) {
+        fetch('/api/announcements/delete', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ id, access_code: code })
-        });
-      } catch (err) {}
-      appState.announcements = appState.announcements.filter(a => a.id !== id);
-      saveStoredAnnouncements();
-      renderAnnouncements();
+          body: JSON.stringify({ id: targetId, access_code: code })
+        }).catch(() => {});
+      }
     }
 
     async function submitPdfUpload(e) {
