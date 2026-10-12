@@ -1207,6 +1207,22 @@
           </div>
         </form>
       </div>
+
+      <!-- Section Gérer & Supprimer les Séances Passées pour le Délégué -->
+      <div style="margin-top:16px;background:white;padding:16px;border-radius:10px;border:1px solid #fed7aa;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
+          <div>
+            <h3 style="font-size:15px;color:#92400e;margin:0;">📋 Gérer & Supprimer les Séances Passées</h3>
+            <p style="font-size:12px;color:var(--muted);margin-top:2px;">
+              Supprimez les annonces des séances qui sont déjà passées pour garder la plateforme propre et claire :
+            </p>
+          </div>
+          <button type="button" class="btn-delete" style="padding:6px 12px;font-size:12px;" onclick="purgeAllPassedAnnouncements()">
+            🧹 Tout vider (Supprimer toutes les annonces)
+          </button>
+        </div>
+        <div id="coordAnnouncementsManageList" style="display:flex;flex-direction:column;gap:8px;max-height:320px;overflow-y:auto;padding-right:4px;"></div>
+      </div>
     </div>
 
     <!-- PROFESSOR PROTECTED PANEL (Espace Professeur Sécurisé & Complet) -->
@@ -1307,6 +1323,22 @@
             <button type="submit" class="btn-submit" id="uploadBtn" style="background:#1e40af;margin-top:0;height:42px;">📤 Envoyer le PDF aux étudiants</button>
           </div>
         </form>
+      </div>
+
+      <!-- Section Gérer & Supprimer les Séances Passées pour le Professeur -->
+      <div style="margin-top:16px;background:white;padding:16px;border-radius:10px;border:1px solid #bfdbfe;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
+          <div>
+            <h3 style="font-size:15px;color:#1e40af;margin:0;">📋 Gérer & Supprimer les Séances Passées</h3>
+            <p style="font-size:12px;color:var(--muted);margin-top:2px;">
+              Supprimez les annonces de cours déjà terminées pour ne laisser que les avis récents :
+            </p>
+          </div>
+          <button type="button" class="btn-delete" style="padding:6px 12px;font-size:12px;" onclick="purgeAllPassedAnnouncements()">
+            🧹 Tout vider (Supprimer toutes les annonces)
+          </button>
+        </div>
+        <div id="profAnnouncementsManageList" style="display:flex;flex-direction:column;gap:8px;max-height:320px;overflow-y:auto;padding-right:4px;"></div>
       </div>
     </div>
 
@@ -1973,57 +2005,96 @@
     function renderAnnouncements() {
       const container = document.getElementById('announcementsList');
       if (!appState.announcements.length) {
-        container.innerHTML = `<div style="color:var(--muted);font-size:13.5px;">Aucune annonce pour le moment.</div>`;
-        return;
+        container.innerHTML = `<div style="color:var(--muted);font-size:13.5px;padding:12px 0;">Aucune annonce pour le moment.</div>`;
+      } else {
+        const statusLabels = {
+          present: '🟢 Cours maintenu (9aryin)',
+          absent: '🔴 Cours reporté / absent',
+          rattrapage: '🟠 Rattrapage',
+          salle: '🟣 Changement de salle',
+          info: '🔵 Information'
+        };
+
+        container.innerHTML = appState.announcements.map(a => {
+          let modTitle = 'Toute la Promotion';
+          if (a.module_id && a.module_id !== 'ALL') {
+            const mod = appState.modules.find(m => m.id === a.module_id);
+            if (mod) modTitle = mod.title;
+          }
+
+          const isAuthed = Boolean(coordSession || profSession);
+          const delBtn = isAuthed
+            ? `<button class="btn-delete" style="background:#fee2e2;color:#b91c1c;border:1px solid #fca5a5;padding:5px 10px;border-radius:6px;font-size:12px;font-weight:700;display:inline-flex;align-items:center;gap:4px;cursor:pointer;" onclick="deleteAnnouncement('${a.id}')" title="Supprimer cette séance passée">🗑️ Supprimer</button>`
+            : '';
+
+          const coordBadge = a.is_coord
+            ? `<span class="badge" style="background:#fef3c7;color:#92400e;border:1px solid #f59e0b;">👑 Avis Délégué de Promotion</span>`
+            : '';
+
+          const sourceText = a.prof_source
+            ? `Transmis par <strong>${a.prof_source}</strong>`
+            : `Par <strong>${a.prof_name}</strong>`;
+
+          return `
+            <div class="ann-item ${a.status_type || 'info'}">
+              <div style="flex:1;">
+                <div style="margin-bottom:6px;display:flex;align-items:center;flex-wrap:wrap;gap:6px;">
+                  <span class="badge ${a.status_type || 'info'}">${statusLabels[a.status_type] || 'Info'}</span>
+                  ${coordBadge}
+                  <strong style="font-size:13.5px;color:var(--primary);">${modTitle}</strong>
+                  <span style="font-size:12px;color:var(--muted);"> · ${a.date_label}</span>
+                </div>
+                <div style="font-size:14px;margin-bottom:5px;line-height:1.5;">${a.message}</div>
+                <div style="font-size:11.5px;color:var(--muted);">${sourceText} · ${a.created_at}</div>
+              </div>
+              <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+                <button class="btn-voice" onclick="speakAnnouncement('${a.id}')" title="Écouter l'annonce">🔊 Écouter</button>
+                ${delBtn}
+              </div>
+            </div>
+          `;
+        }).join('');
       }
 
-      const statusLabels = {
-        present: '🟢 Cours maintenu (9aryin)',
-        absent: '🔴 Cours reporté / absent',
-        rattrapage: '🟠 Rattrapage',
-        salle: '🟣 Changement de salle',
-        info: '🔵 Information'
-      };
-
-      container.innerHTML = appState.announcements.map(a => {
-        let modTitle = 'Toute la Promotion';
-        if (a.module_id && a.module_id !== 'ALL') {
-          const mod = appState.modules.find(m => m.id === a.module_id);
-          if (mod) modTitle = mod.title;
-        }
-
-        const canDelete = profSession || coordSession;
-        const delBtn = canDelete
-          ? `<button class="btn-delete" onclick="deleteAnnouncement('${a.id}')">Supprimer</button>`
-          : '';
-
-        const coordBadge = a.is_coord
-          ? `<span class="badge" style="background:#fef3c7;color:#92400e;border:1px solid #f59e0b;">👑 Avis Délégué de Promotion</span>`
-          : '';
-
-        const sourceText = a.prof_source
-          ? `Transmis par <strong>${a.prof_source}</strong>`
-          : `Par <strong>${a.prof_name}</strong>`;
-
-        return `
-          <div class="ann-item ${a.status_type || 'info'}">
-            <div style="flex:1;">
-              <div style="margin-bottom:6px;display:flex;align-items:center;flex-wrap:wrap;gap:6px;">
-                <span class="badge ${a.status_type || 'info'}">${statusLabels[a.status_type] || 'Info'}</span>
-                ${coordBadge}
-                <strong style="font-size:13.5px;color:var(--primary);">${modTitle}</strong>
-                <span style="font-size:12px;color:var(--muted);"> · ${a.date_label}</span>
+      // Rendu dans le gestionnaire Délégué
+      const coordManageEl = document.getElementById('coordAnnouncementsManageList');
+      if (coordManageEl) {
+        if (!appState.announcements.length) {
+          coordManageEl.innerHTML = `<div style="color:var(--muted);font-size:13px;padding:8px 0;">Aucune annonce publiée actuellement.</div>`;
+        } else {
+          coordManageEl.innerHTML = appState.announcements.map(a => `
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;gap:12px;flex-wrap:wrap;">
+              <div style="flex:1;min-width:220px;">
+                <div style="font-size:12.5px;font-weight:700;color:var(--primary);">${a.date_label || 'Séance'} · ${a.prof_name || 'Professeur'}</div>
+                <div style="font-size:12px;color:#475569;margin-top:2px;">${(a.message || '').substring(0, 90)}${a.message && a.message.length > 90 ? '...' : ''}</div>
               </div>
-              <div style="font-size:14px;margin-bottom:5px;line-height:1.5;">${a.message}</div>
-              <div style="font-size:11.5px;color:var(--muted);">${sourceText} · ${a.created_at}</div>
+              <button type="button" class="btn-delete" style="padding:6px 12px;font-size:12px;" onclick="deleteAnnouncement('${a.id}')">
+                🗑️ Supprimer cette séance
+              </button>
             </div>
-            <div style="display:flex;gap:6px;align-items:center;">
-              <button class="btn-voice" onclick="speakAnnouncement('${a.id}')" title="Écouter l'annonce">🔊 Écouter</button>
-              ${delBtn}
+          `).join('');
+        }
+      }
+
+      // Rendu dans le gestionnaire Professeur
+      const profManageEl = document.getElementById('profAnnouncementsManageList');
+      if (profManageEl) {
+        if (!appState.announcements.length) {
+          profManageEl.innerHTML = `<div style="color:var(--muted);font-size:13px;padding:8px 0;">Aucune annonce publiée actuellement.</div>`;
+        } else {
+          profManageEl.innerHTML = appState.announcements.map(a => `
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;gap:12px;flex-wrap:wrap;">
+              <div style="flex:1;min-width:220px;">
+                <div style="font-size:12.5px;font-weight:700;color:var(--primary);">${a.date_label || 'Séance'} · ${a.prof_name || 'Professeur'}</div>
+                <div style="font-size:12px;color:#475569;margin-top:2px;">${(a.message || '').substring(0, 90)}${a.message && a.message.length > 90 ? '...' : ''}</div>
+              </div>
+              <button type="button" class="btn-delete" style="padding:6px 12px;font-size:12px;" onclick="deleteAnnouncement('${a.id}')">
+                🗑️ Supprimer cette séance
+              </button>
             </div>
-          </div>
-        `;
-      }).join('');
+          `).join('');
+        }
+      }
     }
 
     function renderModules() {
@@ -2439,6 +2510,7 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
         name: data.prof_name || "Délégué de la Promotion",
         role: "coordinator"
       };
+      try { localStorage.setItem('lexdigit_coord_session', JSON.stringify(coordSession)); } catch(e){}
       closeCoordLoginModal();
 
       const btn = document.getElementById('coordAccessBtn');
@@ -2455,6 +2527,7 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
 
     function logoutCoord() {
       coordSession = null;
+      try { localStorage.removeItem('lexdigit_coord_session'); } catch(e){}
       document.getElementById('coordPanel').style.display = 'none';
       const btn = document.getElementById('coordAccessBtn');
       btn.classList.remove('unlocked');
@@ -2652,6 +2725,7 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
         prof_name: data.prof_name,
         module_id: data.module_id
       };
+      try { localStorage.setItem('lexdigit_prof_session', JSON.stringify(profSession)); } catch(e){}
       closeLoginModal();
 
       const btn = document.getElementById('profAccessBtn');
@@ -2680,6 +2754,7 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
 
     function logoutProf() {
       profSession = null;
+      try { localStorage.removeItem('lexdigit_prof_session'); } catch(e){}
       document.getElementById('profPanel').style.display = 'none';
       const btn = document.getElementById('profAccessBtn');
       btn.classList.remove('unlocked');
@@ -2755,6 +2830,48 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
           body: JSON.stringify({ id: targetId, access_code: code })
         }).catch(() => {});
       }
+    }
+
+    function deleteAnnouncementPrompt(id) {
+      if (profSession || coordSession) {
+        deleteAnnouncement(id);
+        return;
+      }
+      const code = prompt("🔑 Pour supprimer cette annonce passée, entrez votre code secret (Délégué ou Professeur) :");
+      if (!code) return;
+      const cleanCode = code.trim().toUpperCase();
+      if (CLIENT_PROF_CODES[cleanCode]) {
+        const info = CLIENT_PROF_CODES[cleanCode];
+        if (info.is_coord) {
+          coordSession = { code: cleanCode, name: info.prof_name || "Délégué de la Promotion", role: "coordinator" };
+          try { localStorage.setItem('lexdigit_coord_session', JSON.stringify(coordSession)); } catch(e){}
+          const btn = document.getElementById('coordAccessBtn');
+          if (btn) {
+            btn.classList.add('unlocked');
+            btn.textContent = '👑 Espace Délégué (Connecté)';
+          }
+        } else {
+          profSession = { code: cleanCode, prof_name: info.prof_name, module_id: info.module_id };
+          try { localStorage.setItem('lexdigit_prof_session', JSON.stringify(profSession)); } catch(e){}
+          const btn = document.getElementById('profAccessBtn');
+          if (btn) {
+            btn.classList.add('unlocked');
+            btn.textContent = `🔓 Espace Prof (${info.prof_name})`;
+          }
+        }
+        deleteAnnouncement(id);
+      } else {
+        alert("❌ Code incorrect. Seul le délégué ou le professeur peut supprimer une annonce.");
+      }
+    }
+
+    function purgeAllPassedAnnouncements() {
+      if (!confirm("⚠️ Voulez-vous vraiment effacer TOUTES les annonces de cours ? Cette action supprimera les avis passés.")) return;
+      appState.announcements.forEach(a => addDeletedId(String(a.id)));
+      appState.announcements = [];
+      saveStoredAnnouncements();
+      renderAnnouncements();
+      alert("✅ Toutes les annonces ont été supprimées avec succès.");
     }
 
     function onFileChosen(role) {
@@ -3244,8 +3361,46 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
       if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
+    function restoreSavedSessions() {
+      try {
+        const savedCoord = localStorage.getItem('lexdigit_coord_session');
+        if (savedCoord) {
+          const parsed = JSON.parse(savedCoord);
+          if (parsed && parsed.code) {
+            coordSession = parsed;
+            const btn = document.getElementById('coordAccessBtn');
+            if (btn) {
+              btn.classList.add('unlocked');
+              btn.textContent = `👑 Espace Délégué (Connecté)`;
+            }
+            const nameEl = document.getElementById('coordWelcomeName');
+            if (nameEl) nameEl.textContent = coordSession.name;
+          }
+        }
+        const savedProf = localStorage.getItem('lexdigit_prof_session');
+        if (savedProf) {
+          const parsed = JSON.parse(savedProf);
+          if (parsed && parsed.code) {
+            profSession = parsed;
+            const btn = document.getElementById('profAccessBtn');
+            if (btn) {
+              btn.classList.add('unlocked');
+              btn.textContent = `🔓 Espace Prof (${profSession.prof_name})`;
+            }
+            const nameEl = document.getElementById('profWelcomeName');
+            if (nameEl) nameEl.textContent = profSession.prof_name;
+            const annProfInp = document.getElementById('profAnnProfName');
+            if (annProfInp) annProfInp.value = profSession.prof_name;
+            const pdfProfInp = document.getElementById('pdfProfName');
+            if (pdfProfInp) pdfProfInp.value = profSession.prof_name;
+          }
+        }
+      } catch(e) {}
+    }
+
     // Initialisations au chargement
     initTheme();
+    restoreSavedSessions();
     loadStoredAnnouncements();
     loadStoredComments();
     loadStoredDocuments();
