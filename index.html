@@ -978,7 +978,7 @@
       </div>
       <div class="header-actions">
         <button id="coordAccessBtn" class="coord-btn" onclick="handleCoordButtonClick()">
-          👑 Espace Délégué (Salah)
+          👑 Espace Délégué
         </button>
         <button id="profAccessBtn" class="prof-btn" onclick="handleProfButtonClick()">
           🔒 Accès Professeur
@@ -1069,45 +1069,100 @@
       </div>
     </div>
 
-    <!-- PROFESSOR PROTECTED PANEL (Hidden until secret code is entered) -->
-    <div id="profPanel" class="box prof-panel">
+    <!-- PROFESSOR PROTECTED PANEL (Espace Professeur Sécurisé & Complet) -->
+    <div id="profPanel" class="box" style="display:none;border:2px solid #1e40af;background:#f0f7ff;box-shadow:0 4px 15px rgba(30,64,175,0.12);">
       <div class="box-header">
-        <div class="box-title" style="color:#b45309;">
-          👨‍🏫 Espace Professeur Sécurisé — <span id="profWelcomeName"></span>
+        <div>
+          <div class="box-title" style="color:#1e40af;font-size:18px;">
+            👨‍🏫 Espace Professeur — <span id="profWelcomeName">Enseignant</span>
+          </div>
+          <p style="font-size:12.5px;color:#1e3a8a;margin-top:2px;">
+            Espace officiel réservé au corps professoral pour diffuser les avis de cours (cours maintenu, absence, rattrapage, changement de salle), générer le message WhatsApp, et partager les supports PDF.
+          </p>
         </div>
-        <button class="btn-delete" onclick="logoutProf()">Déconnexion</button>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn-delete" style="background:#dbeafe;color:#1e40af;border:1px solid #93c5fd;" onclick="downloadUpdatedSiteHtml()">💾 Exporter MAJ pour GitHub</button>
+          <button class="btn-delete" onclick="logoutProf()">Déconnexion</button>
+        </div>
       </div>
 
-      <div class="workspace-grid">
-        <!-- Form 1: Post Announcement ("Wach ghda 9aryin ?") -->
-        <div class="sub-panel" style="background:white;">
-          <h3>📢 Publier une Annonce (Séance / Absence / Rattrapage)</h3>
-          <form onsubmit="submitAnnouncement(event)">
-            <input type="text" id="annProfName" placeholder="Nom du Professeur" required />
-            <select id="annModuleId"></select>
-            <select id="annStatusType">
-              <option value="present">🟢 Cours maintenu (Ghda 9aryin f l-wa9t)</option>
-              <option value="absent">🔴 Cours reporté / absent (Ma-9aryinch)</option>
-              <option value="rattrapage">🟠 Séance de rattrapage</option>
-              <option value="info">🔵 Information générale / Nouveau PDF</option>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(320px, 1fr));gap:16px;">
+        <!-- Colonne 1: Formulaire de Publication Professeur -->
+        <div class="sub-panel" style="background:white;padding:16px;border-radius:10px;border:1px solid #bfdbfe;">
+          <h3 style="font-size:15px;color:#1e40af;margin-bottom:12px;">📢 Diffuser une Annonce Officielle Enseignant</h3>
+          <form onsubmit="submitProfAnnouncement(event)">
+            <label style="font-size:12px;font-weight:700;color:#475569;display:block;margin-bottom:4px;">1. Nom du Professeur :</label>
+            <input type="text" id="profAnnProfName" placeholder="Nom du Professeur" style="font-weight:600;" oninput="updateProfWhatsAppPreview()" required />
+
+            <label style="font-size:12px;font-weight:700;color:#475569;display:block;margin-bottom:4px;">2. Module / Matière concernée :</label>
+            <select id="profAnnModuleSelect" onchange="onProfModuleChange()"></select>
+
+            <label style="font-size:12px;font-weight:700;color:#475569;display:block;margin-bottom:4px;">3. Statut de la séance (Wach ghda 9aryin ?) :</label>
+            <select id="profAnnStatusSelect" onchange="updateProfWhatsAppPreview()">
+              <option value="present">🟢 Cours maintenu (Séance confirmée f l-wa9t)</option>
+              <option value="absent">🔴 Cours reporté / absent (Séance reportée / ma-9aryinch)</option>
+              <option value="rattrapage">🟠 Séance de rattrapage (Rattrapage programmé)</option>
+              <option value="salle">🟣 Changement de salle ou d'horaire</option>
+              <option value="info">🔵 Information générale / Avis important</option>
             </select>
-            <input type="text" id="annDateLabel" placeholder="Jour & Heure (ex: Lundi 13h00 - Salle 8)" required />
-            <textarea id="annMessage" rows="2" placeholder="Message aux étudiants..." required></textarea>
-            <button type="submit" class="btn-submit" style="background:#b45309;">Publier l'annonce</button>
+
+            <label style="font-size:12px;font-weight:700;color:#475569;display:block;margin-bottom:4px;">4. Séance / Jour & Salle :</label>
+            <input type="text" id="profAnnDateInput" placeholder="Ex: Lundi 13h00 (Salle 8)" oninput="updateProfWhatsAppPreview()" required />
+
+            <label style="font-size:12px;font-weight:700;color:#475569;display:block;margin-bottom:4px;">5. Message officiel pour les étudiants :</label>
+            <textarea id="profAnnMessageInput" rows="3" placeholder="Ex: Chers étudiants, la séance aura lieu comme prévu en Salle..." oninput="updateProfWhatsAppPreview()" required></textarea>
+
+            <button type="submit" class="btn-submit" style="background:#1e40af;">📢 Diffuser l'annonce sur le site</button>
           </form>
         </div>
 
-        <!-- Form 2: Upload PDF Course Material -->
-        <div class="sub-panel" style="background:white;">
-          <h3>📄 Déposer un Support de Cours (PDF)</h3>
-          <form onsubmit="submitPdfUpload(event)">
-            <input type="text" id="pdfProfName" placeholder="Nom du Professeur" required />
-            <select id="pdfModuleId"></select>
-            <input type="text" id="pdfTitle" placeholder="Titre du document (ex: Support Chapitre 1)" required />
-            <input type="file" id="pdfFile" accept=".pdf,.doc,.docx,.ppt,.pptx" required />
-            <button type="submit" class="btn-submit" id="uploadBtn" style="background:#1e3a8a;">Envoyer le PDF aux étudiants</button>
-          </form>
+        <!-- Colonne 2: Formateur Message WhatsApp Promo -->
+        <div class="sub-panel" style="background:white;padding:16px;border-radius:10px;border:1px solid #bfdbfe;display:flex;flex-direction:column;justify-content:space-between;">
+          <div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+              <h3 style="font-size:15px;color:#16a34a;">💬 Formateur Message WhatsApp Promo</h3>
+              <span style="font-size:11px;background:#dcfce7;color:#166534;padding:2px 8px;border-radius:10px;font-weight:700;">Automatique</span>
+            </div>
+            <p style="font-size:12px;color:var(--muted);margin-bottom:8px;">
+              Formaté avec style pour être transmis directement aux délégués ou partagé sur WhatsApp :
+            </p>
+            <textarea id="profWhatsappOutput" rows="9" readonly style="font-family:monospace;font-size:12px;background:#f8fafc;border:1px dashed #cbd5e1;padding:10px;line-height:1.45;resize:none;color:#1e293b;"></textarea>
+          </div>
+          <div style="margin-top:12px;">
+            <button type="button" class="btn-submit" onclick="copyProfWhatsAppMessage()" style="background:#16a34a;display:flex;align-items:center;justify-content:center;gap:6px;">
+              📋 Copier pour WhatsApp
+            </button>
+            <div id="profCopySuccessMsg" style="display:none;color:#16a34a;font-size:12px;font-weight:700;margin-top:6px;text-align:center;">
+              ✅ Message copié ! Tu peux le coller direct f WhatsApp.
+            </div>
+          </div>
         </div>
+      </div>
+
+      <!-- Section Déposer un Support de Cours (PDF) -->
+      <div style="margin-top:16px;background:white;padding:16px;border-radius:10px;border:1px solid #bfdbfe;">
+        <h3 style="font-size:15px;color:#1e40af;margin-bottom:10px;">📄 Déposer un Support de Cours (PDF / Document)</h3>
+        <form onsubmit="submitPdfUpload(event)" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:12px;align-items:end;">
+          <div>
+            <label style="font-size:12px;font-weight:700;color:#475569;display:block;margin-bottom:4px;">Nom affiché :</label>
+            <input type="text" id="pdfProfName" placeholder="Nom du Professeur" style="margin-bottom:0;" required />
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:700;color:#475569;display:block;margin-bottom:4px;">Module destinataire :</label>
+            <select id="pdfModuleId" style="margin-bottom:0;"></select>
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:700;color:#475569;display:block;margin-bottom:4px;">Titre du document :</label>
+            <input type="text" id="pdfTitle" placeholder="Ex: Support Cours Chapitre 1" style="margin-bottom:0;" required />
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:700;color:#475569;display:block;margin-bottom:4px;">Fichier (PDF, Word, PPT) :</label>
+            <input type="file" id="pdfFile" accept=".pdf,.doc,.docx,.ppt,.pptx" style="margin-bottom:0;" required />
+          </div>
+          <div>
+            <button type="submit" class="btn-submit" id="uploadBtn" style="background:#1e40af;margin-top:0;height:42px;">📤 Envoyer le PDF aux étudiants</button>
+          </div>
+        </form>
       </div>
     </div>
 
@@ -1334,10 +1389,13 @@
               <span id="commentCountBadge" style="font-size:11.5px;background:#e0f2fe;color:#0369a1;padding:2px 8px;border-radius:10px;font-weight:700;">0 message(s)</span>
             </div>
 
-            <!-- Scope Toggle: Ce Module VS Toute la Promo -->
-            <div style="display:flex;gap:6px;margin-bottom:10px;">
+            <!-- Scope Toggle: Ce Module VS Toute la Promo + Outil Nettoyage des Messages Anciens -->
+            <div style="display:flex;gap:6px;margin-bottom:10px;align-items:center;flex-wrap:wrap;">
               <button type="button" id="chatScopeModBtn" class="tab-btn active" style="font-size:12px;padding:6px 12px;cursor:pointer;" onclick="setChatScope('module')">📘 Ce Module</button>
               <button type="button" id="chatScopePromoBtn" class="tab-btn" style="font-size:12px;padding:6px 12px;cursor:pointer;" onclick="setChatScope('promo')">💬 Salon Général Promo</button>
+              <button type="button" id="cleanChatBtn" class="tab-btn" style="font-size:12px;padding:6px 10px;cursor:pointer;background:#fef2f2;color:#991b1b;border:1px solid #fecaca;margin-left:auto;display:flex;align-items:center;gap:4px;" onclick="openCleanChatModal()" title="Nettoyer les messages anciens">
+                🧹 Nettoyer le chat
+              </button>
             </div>
 
             <div id="moduleCommentsList" class="comment-list"></div>
@@ -1421,17 +1479,17 @@
 
   </div>
 
-  <!-- MODAL CODE SECRET COORDINATEUR / DÉLÉGUÉ -->
+  <!-- MODAL CODE SECRET COORDINATEUR / DÉLÉGUÉ (Discret & Sécurisé) -->
   <div id="coordLoginModal" class="modal-backdrop">
     <div class="modal-card" style="border-top:5px solid #d97706;">
-      <h3 style="font-size:17px;margin-bottom:6px;color:#b45309;">👑 Accès Délégué de Promotion & Coordination</h3>
+      <h3 style="font-size:17px;margin-bottom:6px;color:#b45309;">👑 Accès Délégué de Promotion</h3>
       <p style="font-size:13px;color:var(--muted);margin-bottom:14px;">
-        Entrez votre code secret de Délégué pour publier et gérer les annonces de cours transmises par les professeurs.
+        Espace de coordination officiel. Veuillez saisir votre mot de passe confidentiel pour vous connecter.
       </p>
       <form onsubmit="submitCoordLogin(event)">
-        <input type="password" id="coordSecretCodeInput" placeholder="Code secret (ex: SALAH2026)" required />
+        <input type="password" id="coordSecretCodeInput" placeholder="Mot de passe confidentiel" autocomplete="current-password" required />
         <div id="coordLoginError" style="color:var(--red);font-size:12.5px;margin-bottom:8px;display:none;">
-          ❌ Code secret incorrect. Seul le délégué de la promotion autorisé peut accéder.
+          ❌ Mot de passe incorrect. Accès réservé au délégué autorisé.
         </div>
         <div style="display:flex;gap:8px;">
           <button type="button" onclick="closeCoordLoginModal()" style="flex:1;padding:10px;border-radius:8px;border:1px solid var(--border);background:white;cursor:pointer;font-weight:700;">Annuler</button>
@@ -1441,23 +1499,47 @@
     </div>
   </div>
 
-  <!-- MODAL CODE SECRET PROFESSEUR -->
+  <!-- MODAL CODE SECRET PROFESSEUR (Discret & Sécurisé) -->
   <div id="loginModal" class="modal-backdrop">
     <div class="modal-card">
       <h3 style="font-size:17px;margin-bottom:6px;color:var(--primary);">🔒 Accès Réservé aux Professeurs</h3>
       <p style="font-size:13px;color:var(--muted);margin-bottom:14px;">
-        Entrez votre code secret personnel pour publier une annonce ou ajouter un fichier PDF.
+        Espace réservé au corps professoral. Saisissez votre code d'accès pour accéder à vos outils.
       </p>
       <form onsubmit="submitProfLogin(event)">
-        <input type="password" id="profSecretCodeInput" placeholder="Code secret (ex: LHAROUAL2026)" required />
+        <input type="password" id="profSecretCodeInput" placeholder="Code d'accès enseignant..." autocomplete="current-password" required />
         <div id="loginError" style="color:var(--red);font-size:12.5px;margin-bottom:8px;display:none;">
-          ❌ Code secret incorrect. Seuls les professeurs autorisés peuvent accéder.
+          ❌ Code d'accès incorrect. Seuls les enseignants autorisés peuvent accéder.
         </div>
         <div style="display:flex;gap:8px;">
           <button type="button" onclick="closeLoginModal()" style="flex:1;padding:10px;border-radius:8px;border:1px solid var(--border);background:white;cursor:pointer;font-weight:700;">Annuler</button>
-          <button type="submit" class="btn-submit" style="flex:1;">Déverrouiller</button>
+          <button type="submit" class="btn-submit" style="flex:1;">Se connecter</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- MODAL NETTOYAGE DU FORUM / DISCUSSION -->
+  <div id="cleanChatModal" class="modal-backdrop">
+    <div class="modal-card" style="border-top:5px solid #ef4444;max-width:440px;">
+      <h3 style="font-size:17px;margin-bottom:6px;color:#b91c1c;">🧹 Nettoyer les messages du Forum</h3>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:14px;">
+        Supprimez les anciens messages pour garder la discussion claire, fraîche et rapide :
+      </p>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <button type="button" class="btn-submit" style="background:#f59e0b;padding:12px;font-size:13px;" onclick="purgeCommentsByDays(2)">
+          ⏱️ Supprimer les messages de plus de 48 heures (2 jours)
+        </button>
+        <button type="button" class="btn-submit" style="background:#ea580c;padding:12px;font-size:13px;" onclick="purgeCommentsByDays(7)">
+          📅 Supprimer les messages de plus de 7 jours (1 semaine)
+        </button>
+        <button type="button" class="btn-submit" style="background:#dc2626;padding:12px;font-size:13px;" onclick="purgeAllCurrentComments()">
+          ⚠️ Tout effacer (Vider tous les messages de ce salon)
+        </button>
+        <button type="button" onclick="closeCleanChatModal()" style="padding:10px;border-radius:8px;border:1px solid var(--border);background:white;cursor:pointer;font-weight:700;margin-top:4px;">
+          Annuler
+        </button>
+      </div>
     </div>
   </div>
 
@@ -1799,9 +1881,10 @@
           const words = authorName.split(' ').filter(w => w.length > 0);
           const initials = (words[0] ? words[0][0] : 'E') + (words[1] ? words[1][0] : '');
 
-          const canDelete = profSession || coordSession;
+          const myIds = getMyCommentIds();
+          const canDelete = profSession || coordSession || myIds.has(String(c.id));
           const delBtn = canDelete
-            ? `<button class="btn-delete" style="font-size:11px;padding:2px 6px;margin-left:8px;" onclick="deleteComment('${c.id}')" title="Supprimer">✕</button>`
+            ? `<button class="btn-delete" style="font-size:11px;padding:2px 6px;margin-left:8px;" onclick="deleteComment('${c.id}')" title="Supprimer ce message">✕</button>`
             : '';
 
           return `
@@ -1828,12 +1911,196 @@
       initStudentName();
     }
 
+    function getMyCommentIds() {
+      try {
+        const raw = localStorage.getItem('lexdigit_my_comment_ids');
+        return new Set(raw ? JSON.parse(raw) : []);
+      } catch(e) {
+        return new Set();
+      }
+    }
+
+    function addMyCommentId(id) {
+      const set = getMyCommentIds();
+      set.add(String(id));
+      localStorage.setItem('lexdigit_my_comment_ids', JSON.stringify(Array.from(set)));
+    }
+
+    function getDeletedCommentIds() {
+      try {
+        const raw = localStorage.getItem('lexdigit_deleted_comment_ids');
+        return new Set(raw ? JSON.parse(raw) : []);
+      } catch(e) {
+        return new Set();
+      }
+    }
+
+    function addDeletedCommentIds(ids) {
+      const set = getDeletedCommentIds();
+      const arr = Array.isArray(ids) ? ids : [ids];
+      arr.forEach(id => set.add(String(id)));
+      localStorage.setItem('lexdigit_deleted_comment_ids', JSON.stringify(Array.from(set)));
+    }
+
+    function openCleanChatModal() {
+      document.getElementById('cleanChatModal').style.display = 'flex';
+    }
+
+    function closeCleanChatModal() {
+      document.getElementById('cleanChatModal').style.display = 'none';
+    }
+
+    function purgeCommentsByDays(days) {
+      const isPromo = chatScope === 'promo';
+      const scopeName = isPromo ? "du Salon Général Promo" : "de ce Module";
+      if (!confirm(`Confirmez-vous la suppression des messages de plus de ${days} jour(s) ${scopeName} ?`)) return;
+
+      const now = Date.now();
+      const maxAgeMs = days * 24 * 60 * 60 * 1000;
+      const toDeleteIds = [];
+
+      appState.comments = appState.comments.filter(c => {
+        const isTarget = isPromo ? (c.module_id === 'ALL') : (c.module_id === selectedModuleId);
+        if (!isTarget) return true;
+
+        let ts = c.timestamp;
+        if (!ts && c.id && String(c.id).startsWith('c_')) {
+          const parts = String(c.id).split('_');
+          ts = parseInt(parts[1], 10);
+        }
+        if (!ts) ts = 0;
+
+        const age = now - ts;
+        if (age > maxAgeMs) {
+          toDeleteIds.push(String(c.id));
+          return false;
+        }
+        return true;
+      });
+
+      if (toDeleteIds.length > 0) {
+        addDeletedCommentIds(toDeleteIds);
+        saveStoredComments();
+        renderSelectedModuleWorkspace();
+        fetch(`https://ntfy.sh/${NTFY_TOPIC}`, {
+          method: 'POST',
+          body: JSON.stringify({ action: 'bulk_delete', deleted_ids: toDeleteIds })
+        }).catch(() => {});
+        alert(`✅ Nettoyage terminé : ${toDeleteIds.length} message(s) supprimé(s) avec succès.`);
+      } else {
+        alert("ℹ️ Aucun message ancien à supprimer pour ce délai.");
+      }
+      closeCleanChatModal();
+    }
+
+    function purgeAllCurrentComments() {
+      const isPromo = chatScope === 'promo';
+      const scopeName = isPromo ? "du Salon Général Promo" : "de ce Module";
+      if (!confirm(`⚠️ ATTENTION : Voulez-vous vraiment effacer TOUS les messages ${scopeName} ? Cette action est irréversible.`)) return;
+
+      const toDeleteIds = [];
+      appState.comments = appState.comments.filter(c => {
+        const isTarget = isPromo ? (c.module_id === 'ALL') : (c.module_id === selectedModuleId);
+        if (isTarget) {
+          toDeleteIds.push(String(c.id));
+          return false;
+        }
+        return true;
+      });
+
+      if (toDeleteIds.length > 0) {
+        addDeletedCommentIds(toDeleteIds);
+        saveStoredComments();
+        renderSelectedModuleWorkspace();
+        fetch(`https://ntfy.sh/${NTFY_TOPIC}`, {
+          method: 'POST',
+          body: JSON.stringify({ action: 'bulk_delete', deleted_ids: toDeleteIds })
+        }).catch(() => {});
+        alert(`✅ Le salon a été vidé avec succès (${toDeleteIds.length} message(s) supprimé(s)).`);
+      } else {
+        alert("ℹ️ Le salon est déjà vide.");
+      }
+      closeCleanChatModal();
+    }
+
     function populateProfSelects() {
       const options = appState.modules.map(m =>
         `<option value="${m.id}">[${m.semester}] ${m.title} (${m.professor})</option>`
       ).join('');
-      document.getElementById('annModuleId').innerHTML = options;
-      document.getElementById('pdfModuleId').innerHTML = options;
+      const pMod = document.getElementById('profAnnModuleSelect');
+      if (pMod) pMod.innerHTML = options;
+      const pdfMod = document.getElementById('pdfModuleId');
+      if (pdfMod) pdfMod.innerHTML = options;
+      const cMod = document.getElementById('coordModuleSelect');
+      if (cMod) cMod.innerHTML = options;
+    }
+
+    function onProfModuleChange() {
+      const modId = document.getElementById('profAnnModuleSelect')?.value;
+      const mod = appState.modules.find(m => m.id === modId);
+      const dateInp = document.getElementById('profAnnDateInput');
+      if (dateInp && mod && mod.schedule && mod.room) {
+        dateInp.value = `${mod.schedule} (${mod.room})`;
+      }
+      updateProfWhatsAppPreview();
+    }
+
+    function updateProfWhatsAppPreview() {
+      const profName = (document.getElementById('profAnnProfName')?.value || 'Professeur').trim();
+      const modId = document.getElementById('profAnnModuleSelect')?.value;
+      const mod = appState.modules.find(m => m.id === modId);
+      const modTitle = mod ? `[${mod.semester}] ${mod.title}` : 'Licence Droit Privé & Transformation Digitale';
+      const status = document.getElementById('profAnnStatusSelect')?.value || 'present';
+      const dateVal = document.getElementById('profAnnDateInput')?.value || '';
+      const msgVal = document.getElementById('profAnnMessageInput')?.value || '';
+
+      const statusIcons = {
+        present: '🟢 *COURS MAINTENU (SÉANCE CONFIRMÉE)*',
+        absent: '🔴 *COURS REPORTÉ / ABSENCE DU PROFESSEUR*',
+        rattrapage: '🟠 *SÉANCE DE RATTRAPAGE*',
+        salle: '🟣 *CHANGEMENT DE SALLE OU D\'HORAIRE*',
+        info: '🔵 *INFORMATION OFFICIELLE & AVIS IMPORTANT*'
+      };
+
+      const statusHeader = statusIcons[status] || '📢 *AVIS DE L\'ENSEIGNANT*';
+
+      const waText = 
+`📢 *AVIS OFFICIEL DE L'ENSEIGNANT*
+⚖️ *Licence : Droit Privé et Transformation Digitale (2026-2027)*
+📍 *FSJP El Kelaâ des Sraghna — UCA*
+────────────────────────
+📌 *Statut :* ${statusHeader}
+👨‍🏫 *Professeur :* ${profName}
+📚 *Matière :* ${modTitle}
+🕒 *Séance :* ${dateVal || 'À préciser'}
+
+📝 *Détails / Consigne :*
+${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
+────────────────────────
+🌐 *Plateforme Officielle :* https://salahboulafaa34-hue.github.io/lexdigit-uca-/`;
+
+      const out = document.getElementById('profWhatsappOutput');
+      if (out) out.value = waText;
+    }
+
+    function copyProfWhatsAppMessage() {
+      const out = document.getElementById('profWhatsappOutput');
+      if (!out || !out.value) return;
+      navigator.clipboard.writeText(out.value).then(() => {
+        const msg = document.getElementById('profCopySuccessMsg');
+        if (msg) {
+          msg.style.display = 'block';
+          setTimeout(() => { msg.style.display = 'none'; }, 4000);
+        }
+      }).catch(() => {
+        out.select();
+        document.execCommand('copy');
+        const msg = document.getElementById('profCopySuccessMsg');
+        if (msg) {
+          msg.style.display = 'block';
+          setTimeout(() => { msg.style.display = 'none'; }, 4000);
+        }
+      });
     }
 
     function handleProfButtonClick() {
@@ -2117,12 +2384,19 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
       btn.textContent = `🔓 Espace Prof (${data.prof_name})`;
 
       document.getElementById('profWelcomeName').textContent = data.prof_name;
-      document.getElementById('annProfName').value = data.prof_name;
-      document.getElementById('pdfProfName').value = data.prof_name;
+      const annProfInp = document.getElementById('profAnnProfName');
+      if (annProfInp) annProfInp.value = data.prof_name;
+      const pdfProfInp = document.getElementById('pdfProfName');
+      if (pdfProfInp) pdfProfInp.value = data.prof_name;
+
+      populateProfSelects();
       if (data.module_id && data.module_id !== 'ALL') {
-        document.getElementById('annModuleId').value = data.module_id;
-        document.getElementById('pdfModuleId').value = data.module_id;
+        const annModSel = document.getElementById('profAnnModuleSelect');
+        if (annModSel) annModSel.value = data.module_id;
+        const pdfModSel = document.getElementById('pdfModuleId');
+        if (pdfModSel) pdfModSel.value = data.module_id;
       }
+      onProfModuleChange();
 
       document.getElementById('profPanel').style.display = 'block';
       renderAnnouncements();
@@ -2139,17 +2413,27 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
       renderSelectedModuleWorkspace();
     }
 
-    async function submitAnnouncement(e) {
+    async function submitProfAnnouncement(e) {
       e.preventDefault();
       if (!profSession) return;
+      const profName = (document.getElementById('profAnnProfName')?.value || profSession.prof_name).trim();
+      const modId = document.getElementById('profAnnModuleSelect')?.value || 'ALL';
+      const status = document.getElementById('profAnnStatusSelect')?.value || 'present';
+      const dateVal = (document.getElementById('profAnnDateInput')?.value || '').trim();
+      const msgVal = (document.getElementById('profAnnMessageInput')?.value || '').trim();
+
       const payload = {
+        id: Date.now(),
         access_code: profSession.code,
-        prof_name: document.getElementById('annProfName').value.trim(),
-        module_id: document.getElementById('annModuleId').value,
-        status_type: document.getElementById('annStatusType').value,
-        date_label: document.getElementById('annDateLabel').value.trim(),
-        message: document.getElementById('annMessage').value.trim()
+        prof_name: profName,
+        prof_source: profName,
+        module_id: modId,
+        status_type: status,
+        date_label: dateVal,
+        message: msgVal,
+        created_at: `${profName} · À l'instant`
       };
+
       try {
         await fetch('/api/announcements', {
           method: 'POST',
@@ -2158,13 +2442,17 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
         });
       } catch (err) {}
 
-      // Ajout immédiat à l'interface
-      payload.id = Date.now();
-      payload.created_at = "À l'instant";
       appState.announcements.unshift(payload);
       saveStoredAnnouncements();
       renderAnnouncements();
-      document.getElementById('annMessage').value = '';
+      const msgInp = document.getElementById('profAnnMessageInput');
+      if (msgInp) msgInp.value = '';
+      updateProfWhatsAppPreview();
+      alert("✅ L'annonce a été publiée avec succès sur la plateforme !");
+    }
+
+    async function submitAnnouncement(e) {
+      return submitProfAnnouncement(e);
     }
 
     function deleteAnnouncement(id) {
@@ -2263,6 +2551,7 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
 
       const newComm = {
         id: 'c_' + Date.now() + '_' + Math.floor(Math.random()*1000),
+        timestamp: Date.now(),
         module_id: targetModId,
         author: author,
         author_name: author,
@@ -2270,6 +2559,9 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
         message: message,
         created_at: timeStr
       };
+
+      // Mémoriser l'ID pour autoriser la suppression par son auteur
+      addMyCommentId(newComm.id);
 
       // 1. Ajout immédiat (0ms) à l'affichage
       appState.comments.push(newComm);
@@ -2307,9 +2599,16 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
     function deleteComment(id) {
       if (!confirm("Voulez-vous supprimer ce message ?")) return;
       const strId = String(id);
+      addDeletedCommentIds(strId);
       appState.comments = appState.comments.filter(c => String(c.id) !== strId);
       saveStoredComments();
       renderSelectedModuleWorkspace();
+
+      // Diffuser l'ordre de suppression sur ntfy
+      fetch(`https://ntfy.sh/${NTFY_TOPIC}`, {
+        method: 'POST',
+        body: JSON.stringify({ action: 'delete_comment', target_id: strId })
+      }).catch(() => {});
     }
 
     function setChatScope(scope) {
@@ -2341,15 +2640,45 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
           if (!text) return;
           const lines = text.split('\n').filter(l => l.trim().length > 0);
           let hasNew = false;
+          const deletedIds = getDeletedCommentIds();
           const map = new Map();
-          appState.comments.forEach(c => map.set(String(c.id), c));
+          appState.comments.forEach(c => {
+            const sid = String(c.id);
+            if (!deletedIds.has(sid)) {
+              map.set(sid, c);
+            }
+          });
 
           for (const line of lines) {
             try {
               const item = JSON.parse(line);
               if (item.event === 'message' && item.message) {
                 const msgObj = JSON.parse(item.message);
+
+                // Ordres de suppression reçus du cloud
+                if (msgObj.action === 'delete_comment' && msgObj.target_id) {
+                  addDeletedCommentIds(msgObj.target_id);
+                  if (map.has(String(msgObj.target_id))) {
+                    map.delete(String(msgObj.target_id));
+                    hasNew = true;
+                  }
+                  continue;
+                }
+                if (msgObj.action === 'bulk_delete' && Array.isArray(msgObj.deleted_ids)) {
+                  addDeletedCommentIds(msgObj.deleted_ids);
+                  msgObj.deleted_ids.forEach(delId => {
+                    if (map.has(String(delId))) {
+                      map.delete(String(delId));
+                      hasNew = true;
+                    }
+                  });
+                  continue;
+                }
+
                 const strId = String(msgObj.id || item.id);
+                // Si ce message a été supprimé, ne jamais le réinsérer !
+                if (deletedIds.has(strId)) continue;
+
                 if (!map.has(strId)) {
                   msgObj.id = strId;
                   map.set(strId, msgObj);
@@ -2359,7 +2688,7 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
             } catch(err){}
           }
 
-          if (hasNew) {
+          if (hasNew || map.size !== appState.comments.length) {
             appState.comments = Array.from(map.values());
             saveStoredComments();
             renderSelectedModuleWorkspace();
