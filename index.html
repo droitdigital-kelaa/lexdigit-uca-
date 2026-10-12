@@ -1175,6 +1175,38 @@
           </div>
         </div>
       </div>
+
+      <!-- Section Déposer un Support de Cours (PDF / Document) pour le Délégué -->
+      <div style="margin-top:16px;background:white;padding:16px;border-radius:10px;border:1px solid #fed7aa;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:8px;">
+          <h3 style="font-size:15px;color:#92400e;margin:0;">📄 Déposer un Support de Cours (PDF / Document ou Lien Google Drive)</h3>
+          <span style="font-size:11px;background:#fef3c7;color:#92400e;border:1px solid #f59e0b;padding:2px 8px;border-radius:10px;font-weight:700;">Délégué & Coordination</span>
+        </div>
+        <p style="font-size:12.5px;color:var(--muted);margin-bottom:12px;">
+          Ajoutez les supports de cours transmis par les professeurs pour chaque module. Vous pouvez soit <strong>choisir un fichier PDF</strong> depuis votre téléphone/PC, soit <strong>coller un lien Google Drive</strong>.
+        </p>
+        <form onsubmit="submitPdfUploadUnified(event, 'coord')" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(210px, 1fr));gap:12px;align-items:end;">
+          <div>
+            <label style="font-size:12px;font-weight:700;color:#475569;display:block;margin-bottom:4px;">1. Module destinataire :</label>
+            <select id="coordPdfModuleId" style="margin-bottom:0;" required></select>
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:700;color:#475569;display:block;margin-bottom:4px;">2. Titre du document :</label>
+            <input type="text" id="coordPdfTitle" placeholder="Ex: Support Chapitre 1 - Droit commercial" style="margin-bottom:0;" required />
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:700;color:#475569;display:block;margin-bottom:4px;">3. Fichier PDF (appareil) :</label>
+            <input type="file" id="coordPdfFile" accept=".pdf,.doc,.docx,.ppt,.pptx" style="margin-bottom:0;" onchange="onFileChosen('coord')" />
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:700;color:#475569;display:block;margin-bottom:4px;">OU Lien Google Drive / Web :</label>
+            <input type="url" id="coordPdfLink" placeholder="https://drive.google.com/..." style="margin-bottom:0;" oninput="onLinkTyped('coord')" />
+          </div>
+          <div>
+            <button type="submit" class="btn-submit" id="coordUploadBtn" style="background:#b45309;margin-top:0;height:42px;">📤 Publier le Support PDF</button>
+          </div>
+        </form>
+      </div>
     </div>
 
     <!-- PROFESSOR PROTECTED PANEL (Espace Professeur Sécurisé & Complet) -->
@@ -1249,23 +1281,27 @@
 
       <!-- Section Déposer un Support de Cours (PDF) -->
       <div style="margin-top:16px;background:white;padding:16px;border-radius:10px;border:1px solid #bfdbfe;">
-        <h3 style="font-size:15px;color:#1e40af;margin-bottom:10px;">📄 Déposer un Support de Cours (PDF / Document)</h3>
-        <form onsubmit="submitPdfUpload(event)" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:12px;align-items:end;">
+        <h3 style="font-size:15px;color:#1e40af;margin-bottom:10px;">📄 Déposer un Support de Cours (PDF / Document ou Lien Google Drive)</h3>
+        <form onsubmit="submitPdfUploadUnified(event, 'prof')" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(210px, 1fr));gap:12px;align-items:end;">
           <div>
-            <label style="font-size:12px;font-weight:700;color:#475569;display:block;margin-bottom:4px;">Nom affiché :</label>
+            <label style="font-size:12px;font-weight:700;color:#475569;display:block;margin-bottom:4px;">1. Nom affiché :</label>
             <input type="text" id="pdfProfName" placeholder="Nom du Professeur" style="margin-bottom:0;" required />
           </div>
           <div>
-            <label style="font-size:12px;font-weight:700;color:#475569;display:block;margin-bottom:4px;">Module destinataire :</label>
-            <select id="pdfModuleId" style="margin-bottom:0;"></select>
+            <label style="font-size:12px;font-weight:700;color:#475569;display:block;margin-bottom:4px;">2. Module destinataire :</label>
+            <select id="pdfModuleId" style="margin-bottom:0;" required></select>
           </div>
           <div>
-            <label style="font-size:12px;font-weight:700;color:#475569;display:block;margin-bottom:4px;">Titre du document :</label>
+            <label style="font-size:12px;font-weight:700;color:#475569;display:block;margin-bottom:4px;">3. Titre du document :</label>
             <input type="text" id="pdfTitle" placeholder="Ex: Support Cours Chapitre 1" style="margin-bottom:0;" required />
           </div>
           <div>
-            <label style="font-size:12px;font-weight:700;color:#475569;display:block;margin-bottom:4px;">Fichier (PDF, Word, PPT) :</label>
-            <input type="file" id="pdfFile" accept=".pdf,.doc,.docx,.ppt,.pptx" style="margin-bottom:0;" required />
+            <label style="font-size:12px;font-weight:700;color:#475569;display:block;margin-bottom:4px;">4. Fichier PDF (appareil) :</label>
+            <input type="file" id="pdfFile" accept=".pdf,.doc,.docx,.ppt,.pptx" style="margin-bottom:0;" onchange="onFileChosen('prof')" />
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:700;color:#475569;display:block;margin-bottom:4px;">OU Lien Google Drive / Web :</label>
+            <input type="url" id="pdfLink" placeholder="https://drive.google.com/..." style="margin-bottom:0;" oninput="onLinkTyped('prof')" />
           </div>
           <div>
             <button type="submit" class="btn-submit" id="uploadBtn" style="background:#1e40af;margin-top:0;height:42px;">📤 Envoyer le PDF aux étudiants</button>
@@ -1706,6 +1742,19 @@
       { id: 2, module_id: "s5-m3", prof_name: "Pr. BEYYOUDH MED SAMI", status_type: "present", date_label: "🟢 Jeudi 17h30 (Salle 2BIS)", message: "La séance de Droit des contrats numériques est programmée chaque Jeudi de 17h30 à 19h00 en Salle 2BIS.", created_at: "Officiel FSJP" }
     ];
 
+    const DEFAULT_DOCUMENTS = [
+      {
+        id: "doc_syllabus_s5",
+        module_id: "s5-m1",
+        title: "Descriptif Pédagogique & Programme S5 (Droit des affaires)",
+        prof_name: "Pr. LHAROUAL MOHAMED",
+        filename: "Syllabus_Droit_Prive_Transformation_Digitale_FSJP_Kelaa.pdf",
+        url: "uploads/Syllabus_Droit_Prive_Transformation_Digitale_FSJP_Kelaa.pdf",
+        file_size: "1.1 Mo",
+        uploaded_at: "Officiel FSJP"
+      }
+    ];
+
     const DEFAULT_COMMENTS = [
       { id: "c1", module_id: "s5-m1", author: "Délégué de Promotion", role: "coord", message: "Salam les amis ! Bienvenue sur la plateforme officielle de notre promotion. Posez vos questions et partagez vos remarques ici.", created_at: "10/10/2026 à 14h00" },
       { id: "c2", module_id: "s5-m1", author: "Pr. LHAROUAL MOHAMED", role: "prof", message: "Bienvenue à toutes et à tous. Les supports de cours PDF seront publiés directement dans chaque module.", created_at: "10/10/2026 à 16h30" },
@@ -1729,7 +1778,7 @@
     let appState = {
       modules: DEFAULT_MODULES,
       announcements: DEFAULT_ANNOUNCEMENTS,
-      documents: [],
+      documents: [...DEFAULT_DOCUMENTS],
       comments: DEFAULT_COMMENTS
     };
     let currentTab = 'S5';
@@ -1818,17 +1867,71 @@
       }
     }
 
+    function saveStoredDocuments() {
+      try {
+        localStorage.setItem('lexdigit_documents', JSON.stringify(appState.documents));
+      } catch(e) {
+        try {
+          // Si quota localStorage dépassé par de gros DataURL, alléger le cache local
+          const lightDocs = appState.documents.map(d => {
+            if (d.url && d.url.startsWith('data:') && d.url.length > 500000) {
+              return { ...d, url: '#' };
+            }
+            return d;
+          });
+          localStorage.setItem('lexdigit_documents', JSON.stringify(lightDocs));
+        } catch(err) {}
+      }
+    }
+
+    function loadStoredDocuments() {
+      try {
+        const raw = localStorage.getItem('lexdigit_documents');
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            const map = new Map();
+            parsed.forEach(d => map.set(String(d.id), d));
+            DEFAULT_DOCUMENTS.forEach(d => {
+              if (!map.has(String(d.id))) map.set(String(d.id), d);
+            });
+            appState.documents = Array.from(map.values());
+            return;
+          }
+        }
+        appState.documents = [...DEFAULT_DOCUMENTS];
+        saveStoredDocuments();
+      } catch(e) {
+        appState.documents = [...DEFAULT_DOCUMENTS];
+      }
+    }
+
     async function fetchState() {
       try {
         const res = await fetch('/api/state');
         if (res.ok) {
           const data = await res.json();
           if (data && data.modules && data.modules.length) {
-            appState = data;
+            appState.modules = data.modules;
+            if (data.announcements && data.announcements.length) {
+              appState.announcements = data.announcements;
+              saveStoredAnnouncements();
+            }
+            if (data.documents && data.documents.length) {
+              // Fusionner avec les documents du serveur
+              const map = new Map();
+              data.documents.forEach(d => map.set(String(d.id), d));
+              appState.documents.forEach(d => {
+                if (!map.has(String(d.id))) map.set(String(d.id), d);
+              });
+              appState.documents = Array.from(map.values());
+              saveStoredDocuments();
+            }
             renderAnnouncements();
             renderModules();
             renderSelectedModuleWorkspace();
             populateProfSelects();
+            populateCoordSelects();
           }
         }
       } catch (err) {
@@ -1979,17 +2082,24 @@
           docsEl.innerHTML = `<div style="color:var(--muted);font-size:13px;padding:12px 0;">Aucun support PDF déposé pour ce module pour l'instant.</div>`;
         } else {
           docsEl.innerHTML = docs.map(d => {
-            const delBtn = profSession
-              ? `<button class="btn-delete" onclick="deleteDoc(${d.id})">✕</button>`
+            const delBtn = (profSession || coordSession)
+              ? `<button class="btn-delete" onclick="deleteDoc('${d.id}')" title="Supprimer ce document">✕</button>`
               : '';
+            const rawUrl = d.url || (d.filename ? `uploads/${encodeURIComponent(d.filename)}` : '#');
+            const isExternal = rawUrl.startsWith('http://') || rawUrl.startsWith('https://');
+            const isDataUrl = rawUrl.startsWith('data:');
+            const targetAttr = isExternal ? 'target="_blank" rel="noopener"' : (isDataUrl ? 'target="_blank" download="' + (d.filename || 'document.pdf') + '"' : 'target="_blank" download');
+            const btnLabel = isExternal ? '🔗 Ouvrir / Télécharger' : '⬇ Télécharger';
+            const sizeLabel = d.file_size || (d.is_link ? 'Lien Web' : 'Document PDF');
+
             return `
               <div class="doc-item">
                 <div class="doc-info">
                   <strong>📕 ${d.title}</strong>
-                  <span>Déposé par ${d.prof_name} · ${d.file_size} · ${d.uploaded_at}</span>
+                  <span>Déposé par ${d.prof_name || 'Enseignant'} · ${sizeLabel} · ${d.uploaded_at || ''}</span>
                 </div>
                 <div style="display:flex;gap:6px;align-items:center;">
-                  <a class="btn-download" href="/uploads/${encodeURIComponent(d.filename)}" target="_blank" download>⬇ Télécharger</a>
+                  <a class="btn-download" href="${rawUrl}" ${targetAttr}>${btnLabel}</a>
                   ${delBtn}
                 </div>
               </div>
@@ -2359,6 +2469,12 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
       ).join('');
       const el = document.getElementById('coordModuleSelect');
       if (el) el.innerHTML = options;
+
+      const pdfOptions = appState.modules.map(m =>
+        `<option value="${m.id}">[${m.semester}] ${m.title} (${m.professor})</option>`
+      ).join('');
+      const pdfEl = document.getElementById('coordPdfModuleId');
+      if (pdfEl) pdfEl.innerHTML = pdfOptions;
     }
 
     function onCoordSourceChange() {
@@ -2485,9 +2601,14 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
     function downloadUpdatedSiteHtml() {
       const currentDocHtml = document.documentElement.outerHTML;
       const annJson = JSON.stringify(appState.announcements, null, 2);
-      const replaced = currentDocHtml.replace(
+      const docJson = JSON.stringify(appState.documents, null, 2);
+      let replaced = currentDocHtml.replace(
         /const DEFAULT_ANNOUNCEMENTS = \[[\s\S]*?\];/,
         `const DEFAULT_ANNOUNCEMENTS = ${annJson};`
+      );
+      replaced = replaced.replace(
+        /const DEFAULT_DOCUMENTS = \[[\s\S]*?\];/,
+        `const DEFAULT_DOCUMENTS = ${docJson};`
       );
       const blob = new Blob([replaced], { type: 'text/html;charset=utf-8' });
       const a = document.createElement('a');
@@ -2636,43 +2757,204 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
       }
     }
 
-    async function submitPdfUpload(e) {
-      e.preventDefault();
-      if (!profSession) return;
-      const fileInput = document.getElementById('pdfFile');
-      if (!fileInput.files.length) return;
-
-      const btn = document.getElementById('uploadBtn');
-      btn.textContent = 'Envoi en cours...';
-      btn.disabled = true;
-
-      const fd = new FormData();
-      fd.append('access_code', profSession.code);
-      fd.append('prof_name', document.getElementById('pdfProfName').value.trim());
-      fd.append('module_id', document.getElementById('pdfModuleId').value);
-      fd.append('title', document.getElementById('pdfTitle').value.trim());
-      fd.append('file', fileInput.files[0]);
-
-      const res = await fetch('/api/upload', { method: 'POST', body: fd });
-      btn.textContent = 'Envoyer le PDF aux étudiants';
-      btn.disabled = false;
-
-      if (res.ok) {
-        selectedModuleId = document.getElementById('pdfModuleId').value;
-        document.getElementById('pdfTitle').value = '';
-        fileInput.value = '';
-        await fetchState();
+    function onFileChosen(role) {
+      const prefix = role === 'coord' ? 'coordPdf' : 'pdf';
+      const fileInput = document.getElementById(prefix + 'File');
+      const linkInput = document.getElementById(prefix + 'Link');
+      const titleInput = document.getElementById(prefix + 'Title');
+      if (fileInput && fileInput.files && fileInput.files.length > 0) {
+        if (linkInput) linkInput.value = '';
+        if (titleInput && !titleInput.value.trim()) {
+          const rawName = fileInput.files[0].name.replace(/\.[^/.]+$/, "");
+          titleInput.value = rawName.replace(/_/g, ' ');
+        }
       }
     }
 
+    function onLinkTyped(role) {
+      const prefix = role === 'coord' ? 'coordPdf' : 'pdf';
+      const fileInput = document.getElementById(prefix + 'File');
+      const linkInput = document.getElementById(prefix + 'Link');
+      if (linkInput && linkInput.value.trim() && fileInput) {
+        fileInput.value = '';
+      }
+    }
+
+    async function submitPdfUploadUnified(e, role) {
+      e.preventDefault();
+      const isCoord = role === 'coord';
+      if (isCoord && !coordSession) return;
+      if (!isCoord && !profSession) return;
+
+      const prefix = isCoord ? 'coordPdf' : 'pdf';
+      const modSelect = document.getElementById(prefix + 'ModuleId');
+      const modId = modSelect ? modSelect.value : 's5-m1';
+      const titleInput = document.getElementById(prefix + 'Title');
+      const title = titleInput ? titleInput.value.trim() : '';
+      const fileInput = document.getElementById(prefix + 'File');
+      const linkInput = document.getElementById(prefix + 'Link');
+      const profName = isCoord
+        ? "Coordination de la Promotion"
+        : ((document.getElementById('pdfProfName')?.value || profSession.prof_name).trim());
+      const btn = document.getElementById(isCoord ? 'coordUploadBtn' : 'uploadBtn');
+
+      const linkVal = linkInput ? linkInput.value.trim() : '';
+      const hasFile = fileInput && fileInput.files && fileInput.files.length > 0;
+
+      if (!title) {
+        alert("⚠️ Veuillez renseigner le titre du document.");
+        return;
+      }
+      if (!hasFile && !linkVal) {
+        alert("⚠️ Veuillez soit choisir un fichier PDF, soit coller un lien Google Drive.");
+        return;
+      }
+
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = "Publication en cours...";
+      }
+
+      const now = new Date();
+      const day = String(now.getDate()).padStart(2, '0');
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const hours = String(now.getHours()).padStart(2, '0');
+      const mins = String(now.getMinutes()).padStart(2, '0');
+      const timeStr = `${day}/${month} à ${hours}:${mins}`;
+
+      // CAS 1 : Lien Google Drive ou Web
+      if (linkVal) {
+        const newDoc = {
+          id: 'doc_' + Date.now(),
+          module_id: modId,
+          title: title,
+          prof_name: profName,
+          filename: title + '.pdf',
+          file_size: 'Lien Google Drive',
+          uploaded_at: timeStr,
+          url: linkVal,
+          is_link: true
+        };
+        finalizeDocAddition(newDoc, modId, fileInput, linkInput, titleInput, btn, isCoord);
+        return;
+      }
+
+      // CAS 2 : Fichier PDF choisi localement
+      const file = fileInput.files[0];
+      const fileSizeStr = (file.size > 1024 * 1024)
+        ? (file.size / (1024 * 1024)).toFixed(1) + ' Mo'
+        : Math.round(file.size / 1024) + ' Ko';
+
+      // 1. Essai d'upload backend sur le serveur si actif
+      let uploadedServerUrl = null;
+      try {
+        const fd = new FormData();
+        const code = isCoord ? coordSession.code : profSession.code;
+        fd.append('access_code', code);
+        fd.append('prof_name', profName);
+        fd.append('module_id', modId);
+        fd.append('title', title);
+        fd.append('file', file);
+        const res = await fetch('/api/upload', { method: 'POST', body: fd });
+        if (res.ok) {
+          const resData = await res.json();
+          if (resData && resData.document && resData.document.filename) {
+            uploadedServerUrl = `/uploads/${encodeURIComponent(resData.document.filename)}`;
+          }
+        }
+      } catch(err) {}
+
+      if (uploadedServerUrl) {
+        const newDoc = {
+          id: 'doc_' + Date.now(),
+          module_id: modId,
+          title: title,
+          prof_name: profName,
+          filename: file.name,
+          file_size: fileSizeStr,
+          uploaded_at: timeStr,
+          url: uploadedServerUrl
+        };
+        finalizeDocAddition(newDoc, modId, fileInput, linkInput, titleInput, btn, isCoord);
+        return;
+      }
+
+      // 2. Fallback universel (GitHub Pages ou mode statique) via FileReader
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        const dataUrl = evt.target.result;
+        const newDoc = {
+          id: 'doc_' + Date.now(),
+          module_id: modId,
+          title: title,
+          prof_name: profName,
+          filename: file.name,
+          file_size: fileSizeStr,
+          uploaded_at: timeStr,
+          url: dataUrl
+        };
+        finalizeDocAddition(newDoc, modId, fileInput, linkInput, titleInput, btn, isCoord);
+      };
+      reader.onerror = function() {
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = isCoord ? "📤 Publier le Support PDF" : "📤 Envoyer le PDF aux étudiants";
+        }
+        alert("❌ Erreur lors de la lecture du fichier PDF.");
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function finalizeDocAddition(newDoc, modId, fileInput, linkInput, titleInput, btn, isCoord) {
+      appState.documents.unshift(newDoc);
+      saveStoredDocuments();
+
+      // Basculer l'affichage vers le module destinataire
+      selectedDocModuleId = modId;
+      selectedModuleId = modId;
+
+      renderSelectedModuleDocs();
+      renderModules();
+
+      // Réinitialiser les champs
+      if (fileInput) fileInput.value = '';
+      if (linkInput) linkInput.value = '';
+      if (titleInput) titleInput.value = '';
+
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = isCoord ? "📤 Publier le Support PDF" : "📤 Envoyer le PDF aux étudiants";
+      }
+
+      alert(`✅ Le support de cours "${newDoc.title}" a été ajouté avec succès dans le module !`);
+
+      // Défiler en douceur vers la section des cours
+      const wsEl = document.getElementById('moduleWorkspace');
+      if (wsEl) wsEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    async function submitPdfUpload(e) {
+      return submitPdfUploadUnified(e, 'prof');
+    }
+
     async function deleteDoc(id) {
-      if (!profSession) return;
-      await fetch('/api/documents/delete', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id, access_code: profSession.code })
-      });
-      await fetchState();
+      if (!profSession && !coordSession) return;
+      if (!confirm("Voulez-vous vraiment supprimer ce support de cours ?")) return;
+
+      const targetId = String(id);
+      appState.documents = appState.documents.filter(d => String(d.id) !== targetId);
+      saveStoredDocuments();
+      renderSelectedModuleDocs();
+      renderModules();
+
+      try {
+        const code = profSession ? profSession.code : (coordSession ? coordSession.code : '');
+        await fetch('/api/documents/delete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: targetId, access_code: code })
+        });
+      } catch(e) {}
     }
 
     function submitComment(e) {
@@ -2966,6 +3248,7 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
     initTheme();
     loadStoredAnnouncements();
     loadStoredComments();
+    loadStoredDocuments();
     populateCoordSelects();
     renderAnnouncements();
     renderModules();
