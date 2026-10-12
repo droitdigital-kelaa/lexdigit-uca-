@@ -1085,8 +1085,6 @@
         <p class="brand-sub" style="margin:2px 0 0 0;font-size:13px;color:#cbd5e1;">Faculté des Sciences Juridiques et Politiques (FSJP) — El Kelaâ des Sraghna · Université Cadi Ayyad</p>
       </div>
       <div class="header-actions">
-        <button id="themeToggleBtn" onclick="toggleTheme()" class="theme-toggle-btn" title="Changer de thème">🌙</button>
-        <button onclick="sharePlatform()" class="share-btn" title="Partager la plateforme">📲 Partager</button>
         <button id="coordAccessBtn" class="coord-btn" onclick="handleCoordButtonClick()">
           👑 Espace Délégué
         </button>
@@ -1519,17 +1517,12 @@
         </div>
       </div>
 
-      <!-- Filter bar: Tous les sujets / Filtrer par module -->
-      <div style="display:flex;gap:6px;margin-bottom:14px;align-items:center;flex-wrap:wrap;">
-        <button type="button" class="tab-btn active" id="chatFilterALL" onclick="setForumFilter('ALL')">🌐 Tous les Sujets (Open)</button>
-        <button type="button" class="tab-btn" id="chatFilterS5M1" onclick="setForumFilter('s5-m1')">⚖️ Droit des affaires</button>
-        <button type="button" class="tab-btn" id="chatFilterS5M5" onclick="setForumFilter('s5-m5')">💼 Droit du travail</button>
-        <button type="button" class="tab-btn" id="chatFilterS5M6" onclick="setForumFilter('s5-m6')">🛡️ Gouvernance</button>
-        <button type="button" class="tab-btn" id="chatFilterS5M4" onclick="setForumFilter('s5-m4')">🛒 E-Commerce</button>
-        <button type="button" class="tab-btn" id="chatFilterS5M2" onclick="setForumFilter('s5-m2')">🏛️ Processuel</button>
-        <button type="button" class="tab-btn" id="chatFilterS5M3" onclick="setForumFilter('s5-m3')">📜 Contrats</button>
-        <button type="button" class="tab-btn" id="chatFilterGEN" onclick="setForumFilter('GEN')">💬 Général Promo</button>
-        <button type="button" class="tab-btn" style="font-size:12px;padding:6px 10px;cursor:pointer;background:#fef2f2;color:#991b1b;border:1px solid #fecaca;margin-left:auto;display:flex;align-items:center;gap:4px;" onclick="openCleanChatModal()" title="Nettoyer les messages anciens">
+      <!-- Bar: Tous les Sujets + Bouton Nettoyer le chat -->
+      <div style="display:flex;gap:8px;margin-bottom:14px;align-items:center;justify-content:space-between;flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <button type="button" class="tab-btn active" id="chatFilterALL" style="cursor:default;font-weight:700;">🌐 Tous les Sujets</button>
+        </div>
+        <button type="button" class="tab-btn" style="font-size:12px;padding:6px 12px;cursor:pointer;background:#fef2f2;color:#991b1b;border:1px solid #fecaca;display:flex;align-items:center;gap:4px;" onclick="openCleanChatModal()" title="Nettoyer les messages anciens">
           🧹 Nettoyer le chat
         </button>
       </div>
@@ -1539,27 +1532,11 @@
 
       <!-- Live message submission form -->
       <form onsubmit="submitComment(event)" style="margin-top:14px;border-top:1px solid var(--border);padding-top:14px;">
-        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:10px;margin-bottom:8px;">
-          <div>
-            <label style="font-size:11.5px;font-weight:700;color:var(--muted);display:block;margin-bottom:3px;">Votre Nom & Prénom :</label>
-            <input type="text" id="commentAuthor" placeholder="Votre Nom & Prénom" style="margin-bottom:0;" required />
-          </div>
-          <div>
-            <label style="font-size:11.5px;font-weight:700;color:var(--muted);display:block;margin-bottom:3px;">Sujet / Matière concernée :</label>
-            <select id="commentTopicSelect" style="margin-bottom:0;font-weight:600;">
-              <option value="GEN">💬 Général / Discussion Libre Promotion</option>
-              <option value="s5-m1">⚖️ Droit des affaires (Pr. LHAROUAL)</option>
-              <option value="s5-m5">💼 Droit du travail numérique (Pr. RAHMOUNE)</option>
-              <option value="s5-m6">🛡️ Gouvernance et éthique (Pr. CHAKIR)</option>
-              <option value="s5-m4">🛒 Droit du commerce électronique (Pr. BOUSSETTA)</option>
-              <option value="s5-m2">🏛️ Droit processuel (Pr. ASSEMAHLI)</option>
-              <option value="s5-m3">📜 Droit des contrats numériques (Pr. BEYYOUDH)</option>
-              <option value="s5-m7">🇬🇧 Langues étrangères (Anglais)</option>
-              <option value="REVISIONS">📢 Révisions, Examens & Avis de classe</option>
-            </select>
-          </div>
+        <div style="margin-bottom:8px;">
+          <label style="font-size:11.5px;font-weight:700;color:var(--muted);display:block;margin-bottom:3px;">Votre Nom & Prénom :</label>
+          <input type="text" id="commentAuthor" placeholder="Ex: Mohamed Alami" style="margin-bottom:0;" required />
         </div>
-        <textarea id="commentMessage" rows="2" placeholder="Posez une question, partagez une information ou répondez à vos camarades..." style="margin-bottom:8px;" required></textarea>
+        <textarea id="commentMessage" rows="2" placeholder="Posez une question, partagez une information ou discutez avec vos camarades..." style="margin-bottom:8px;" required></textarea>
         <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">
           <span id="commentToast" style="font-size:12px;color:#16a34a;font-weight:700;display:none;">⚡ Message diffusé en direct (0s) !</span>
           <button type="submit" class="btn-submit" style="margin-top:0;width:auto;padding:10px 22px;margin-left:auto;background:var(--primary);font-weight:700;">Envoyer en Direct 🚀</button>
@@ -2023,30 +2000,7 @@
     }
 
     function setForumFilter(topic) {
-      forumFilter = topic;
-      const buttons = document.querySelectorAll('#forumSection .tab-btn');
-      buttons.forEach(btn => {
-        if (btn.id === 'cleanChatBtn' || (btn.getAttribute('onclick') || '').includes('openCleanChatModal')) return;
-        btn.classList.remove('active');
-      });
-      const filterIdMap = {
-        'ALL': 'chatFilterALL',
-        's5-m1': 'chatFilterS5M1',
-        's5-m5': 'chatFilterS5M5',
-        's5-m6': 'chatFilterS5M6',
-        's5-m4': 'chatFilterS5M4',
-        's5-m2': 'chatFilterS5M2',
-        's5-m3': 'chatFilterS5M3',
-        'GEN': 'chatFilterGEN'
-      };
-      const activeBtn = document.getElementById(filterIdMap[topic] || 'chatFilterALL');
-      if (activeBtn) activeBtn.classList.add('active');
-
-      const topicSel = document.getElementById('commentTopicSelect');
-      if (topicSel && topic !== 'ALL') {
-        topicSel.value = topic;
-      }
-
+      forumFilter = 'ALL';
       renderForumComments(false);
     }
 
@@ -2054,20 +2008,13 @@
       const commEl = document.getElementById('moduleCommentsList');
       if (!commEl) return;
 
-      const comments = appState.comments.filter(c => {
-        if (forumFilter === 'ALL') return true; // SHOW EVERY MESSAGE IN OPEN MODE!
-        if (forumFilter === 'GEN') return (!c.module_id || c.module_id === 'ALL' || c.module_id === 'GEN');
-        return c.module_id === forumFilter;
-      });
+      const comments = appState.comments;
 
       const countBadge = document.getElementById('commentCountBadge');
       if (countBadge) countBadge.textContent = `${comments.length} message(s)`;
 
       if (!comments.length) {
-        const emptyMsg = forumFilter === 'ALL'
-          ? "Aucun message pour le moment. Soyez le premier à poser une question ou partager une info avec vos camarades !"
-          : `Aucun message dans cette section (${TOPIC_LABELS[forumFilter] || forumFilter}). Écrivez le premier mot ci-dessous !`;
-        commEl.innerHTML = `<div style="color:var(--muted);font-size:13.5px;padding:32px 0;text-align:center;">💬 ${emptyMsg}</div>`;
+        commEl.innerHTML = `<div style="color:var(--muted);font-size:13.5px;padding:32px 0;text-align:center;">💬 Aucun message pour le moment. Soyez le premier à poser une question ou partager une information avec vos camarades !</div>`;
       } else {
         commEl.innerHTML = comments.map(c => {
           const isProf = c.role === 'prof';
@@ -2097,8 +2044,6 @@
             ? `<button class="btn-delete" style="font-size:11px;padding:2px 6px;margin-left:8px;" onclick="deleteComment('${c.id}')" title="Supprimer ce message">✕</button>`
             : '';
 
-          const topicBadge = TOPIC_LABELS[c.module_id] || TOPIC_LABELS['GEN'];
-
           return `
             <div class="comment-item ${itemClass}">
               <div class="comment-avatar ${avatarClass}">${isCoord ? '👑' : (isProf ? '👨‍🏫' : initials.toUpperCase())}</div>
@@ -2107,7 +2052,6 @@
                   <div class="comment-author">
                     <span>${authorName}</span>
                     ${roleBadge}
-                    <span style="font-size:10.5px;background:#f1f5f9;color:#334155;border:1px solid #cbd5e1;padding:1px 6px;border-radius:4px;font-weight:600;">${topicBadge}</span>
                   </div>
                   <div>
                     <span>${c.created_at || "À l'instant"}</span>
@@ -2175,18 +2119,13 @@
     }
 
     function purgeCommentsByDays(days) {
-      const isPromo = chatScope === 'promo';
-      const scopeName = isPromo ? "du Salon Général Promo" : "de ce Module";
-      if (!confirm(`Confirmez-vous la suppression des messages de plus de ${days} jour(s) ${scopeName} ?`)) return;
+      if (!confirm(`Confirmez-vous la suppression des messages de plus de ${days} jour(s) du Forum ?`)) return;
 
       const now = Date.now();
       const maxAgeMs = days * 24 * 60 * 60 * 1000;
       const toDeleteIds = [];
 
       appState.comments = appState.comments.filter(c => {
-        const isTarget = isPromo ? (c.module_id === 'ALL') : (c.module_id === selectedModuleId);
-        if (!isTarget) return true;
-
         let ts = c.timestamp;
         if (!ts && c.id && String(c.id).startsWith('c_')) {
           const parts = String(c.id).split('_');
@@ -2205,7 +2144,7 @@
       if (toDeleteIds.length > 0) {
         addDeletedCommentIds(toDeleteIds);
         saveStoredComments();
-        renderSelectedModuleWorkspace();
+        renderForumComments(false);
         fetch(`https://ntfy.sh/${NTFY_TOPIC}`, {
           method: 'POST',
           body: JSON.stringify({ action: 'bulk_delete', deleted_ids: toDeleteIds })
@@ -2218,24 +2157,15 @@
     }
 
     function purgeAllCurrentComments() {
-      const isPromo = chatScope === 'promo';
-      const scopeName = isPromo ? "du Salon Général Promo" : "de ce Module";
-      if (!confirm(`⚠️ ATTENTION : Voulez-vous vraiment effacer TOUS les messages ${scopeName} ? Cette action est irréversible.`)) return;
+      if (!confirm(`⚠️ ATTENTION : Voulez-vous vraiment effacer TOUS les messages du Forum ? Cette action est irréversible.`)) return;
 
-      const toDeleteIds = [];
-      appState.comments = appState.comments.filter(c => {
-        const isTarget = isPromo ? (c.module_id === 'ALL') : (c.module_id === selectedModuleId);
-        if (isTarget) {
-          toDeleteIds.push(String(c.id));
-          return false;
-        }
-        return true;
-      });
+      const toDeleteIds = appState.comments.map(c => String(c.id));
+      appState.comments = [];
 
       if (toDeleteIds.length > 0) {
         addDeletedCommentIds(toDeleteIds);
         saveStoredComments();
-        renderSelectedModuleWorkspace();
+        renderForumComments(false);
         fetch(`https://ntfy.sh/${NTFY_TOPIC}`, {
           method: 'POST',
           body: JSON.stringify({ action: 'bulk_delete', deleted_ids: toDeleteIds })
@@ -2749,10 +2679,9 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
       e.preventDefault();
       const authorInp = document.getElementById('commentAuthor');
       const msgInp = document.getElementById('commentMessage');
-      const topicSel = document.getElementById('commentTopicSelect');
       const author = (authorInp ? authorInp.value : '').trim();
       const message = (msgInp ? msgInp.value : '').trim();
-      const topic = topicSel ? topicSel.value : 'GEN';
+      const topic = 'ALL';
       if (!author || !message) return;
 
       // Mémoriser le nom de l'étudiant
@@ -3011,39 +2940,9 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
       });
     }
 
-    // MODE SOMBRE (DARK MODE) & THÈME
-    function toggleTheme() {
-      const isDark = document.body.classList.toggle('dark-mode');
-      localStorage.setItem('lexdigit_theme', isDark ? 'dark' : 'light');
-      const btn = document.getElementById('themeToggleBtn');
-      if (btn) btn.textContent = isDark ? '☀️' : '🌙';
-    }
-
     function initTheme() {
-      const saved = localStorage.getItem('lexdigit_theme');
-      if (saved === 'dark') {
-        document.body.classList.add('dark-mode');
-        const btn = document.getElementById('themeToggleBtn');
-        if (btn) btn.textContent = '☀️';
-      }
-    }
-
-    // PARTAGER LA PLATEFORME SUR WHATSAPP
-    function sharePlatform() {
-      const shareData = {
-        title: "LexDigit FSJP El Kelaâ - UCA",
-        text: "Plateforme officielle de la Licence Droit Privé et Transformation Digitale (FSJP El Kelaâ · UCA) : Cours, emplois du temps et annonces en direct !",
-        url: window.location.href
-      };
-      if (navigator.share) {
-        navigator.share(shareData).catch(() => {});
-      } else {
-        navigator.clipboard.writeText(window.location.href).then(() => {
-          alert("📋 Lien officiel de la plateforme copié dans le presse-papier ! Tu peux le coller dans WhatsApp.");
-        }).catch(() => {
-          prompt("Copiez ce lien pour le partager :", window.location.href);
-        });
-      }
+      document.body.classList.remove('dark-mode');
+      try { localStorage.removeItem('lexdigit_theme'); } catch(e){}
     }
 
     function mobileNavTo(sectionId) {
