@@ -661,43 +661,308 @@
       background: #fffbeb;
     }
 
-    @media (max-width: 680px) {
+    /* ══════════════════════════════════════════════════════════════════
+       📱 MOBILE RESPONSIVE OPTIMIZATION (SMARTPHONE FIRST DESIGN)
+       ══════════════════════════════════════════════════════════════════ */
+    
+    /* Mobile Bottom Navigation Bar (Hidden on Desktop) */
+    .mobile-bottom-nav {
+      display: none;
+    }
+
+    /* Mobile Day Cards Schedule (Hidden on Desktop) */
+    .mobile-schedule-cards {
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding-bottom: 80px; /* Space for mobile bottom bar */
+        font-size: 14px;
+        overflow-x: hidden;
+      }
+
+      /* 1. HEADER MOBILE */
       header {
-        padding: 14px 16px;
+        padding: 12px 14px;
+        position: sticky;
+        top: 0;
+        z-index: 60;
+      }
+      .header-inner {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
       }
       .brand-title {
         font-size: 16px;
+        line-height: 1.25;
       }
       .brand-sub {
-        font-size: 12px;
+        font-size: 11.5px;
+        line-height: 1.35;
+        margin-top: 3px;
       }
-      .prof-btn {
+      .header-actions {
         width: 100%;
-        text-align: center;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin-top: 4px;
       }
+      .coord-btn, .prof-btn {
+        width: 100%;
+        padding: 9px 6px;
+        font-size: 12px;
+        font-weight: 700;
+        text-align: center;
+        justify-content: center;
+        border-radius: 8px;
+        min-height: 40px;
+        white-space: nowrap;
+      }
+
+      /* 2. CONTAINER & BOXES */
       .container {
-        margin: 14px auto;
-        padding: 0 12px;
+        margin: 10px auto;
+        padding: 0 10px;
       }
       .box {
-        padding: 15px;
+        padding: 14px 12px;
         border-radius: 12px;
+        margin-bottom: 14px;
       }
-      .modules-grid {
-        grid-template-columns: 1fr;
+      .box-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
       }
+      .box-title {
+        font-size: 15.5px;
+        line-height: 1.3;
+      }
+
+      /* 3. TABS (HORIZONTAL SCROLL ON MOBILE) */
       .tabs {
         width: 100%;
+        display: flex;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 4px;
+        gap: 6px;
+        scrollbar-width: none;
+      }
+      .tabs::-webkit-scrollbar {
+        display: none;
       }
       .tab-btn {
-        flex: 1;
-        text-align: center;
-        padding: 8px 10px;
+        flex: none;
+        padding: 8px 14px;
+        font-size: 12.5px;
+        white-space: nowrap;
+        border-radius: 8px;
+      }
+
+      /* 4. MODULES GRID */
+      .modules-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+      .module-card {
+        padding: 13px;
+        border-radius: 10px;
+        gap: 8px;
+      }
+      .mod-title {
+        font-size: 14.5px;
+      }
+      .mod-prof {
         font-size: 12.5px;
       }
+      .mod-schedule {
+        font-size: 11.5px;
+        flex-wrap: wrap;
+        gap: 4px;
+      }
+
+      /* 5. ANNOUNCEMENTS LIST */
       .ann-item {
         flex-direction: column;
+        align-items: stretch;
         gap: 8px;
+        padding: 11px 12px;
+      }
+      .btn-delete {
+        align-self: flex-end;
+      }
+
+      /* 6. TIMETABLE: MOBILE DAY CARDS VIEW */
+      .timetable-wrap {
+        display: block;
+      }
+      table.timetable {
+        display: none; /* Hide wide desktop table on smartphone */
+      }
+      .mobile-schedule-cards {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-top: 10px;
+      }
+      .day-card {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 12px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+      }
+      .day-card-header {
+        font-weight: 800;
+        font-size: 13px;
+        color: var(--primary);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 2px solid #e2e8f0;
+        padding-bottom: 6px;
+        margin-bottom: 8px;
+      }
+      .day-class-slot {
+        background: white;
+        border-left: 4px solid var(--primary);
+        border-radius: 8px;
+        padding: 9px 11px;
+        margin-bottom: 6px;
+        border-top: 1px solid #f1f5f9;
+        border-right: 1px solid #f1f5f9;
+        border-bottom: 1px solid #f1f5f9;
+      }
+      .day-class-slot.salle5 {
+        border-left-color: #2563eb;
+      }
+      .day-class-slot.salle8 {
+        border-left-color: #d97706;
+      }
+      .day-class-slot.salle2bis {
+        border-left-color: #9333ea;
+      }
+      .day-slot-time {
+        font-size: 12px;
+        font-weight: 800;
+        color: #475569;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 3px;
+      }
+      .day-slot-title {
+        font-size: 13.5px;
+        font-weight: 800;
+        color: #0f172a;
+      }
+      .day-slot-prof {
+        font-size: 12px;
+        color: #64748b;
+        margin-top: 2px;
+      }
+
+      /* 7. WORKSPACE GRID & FORUM */
+      .workspace-grid {
+        grid-template-columns: 1fr;
+        gap: 14px;
+      }
+      .sub-panel {
+        padding: 13px;
+        border-radius: 10px;
+      }
+      .doc-item {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+      }
+      .btn-download {
+        text-align: center;
+        padding: 8px;
+      }
+      .comment-list {
+        max-height: 380px;
+      }
+      .comment-item {
+        padding: 10px 11px;
+        gap: 9px;
+      }
+      .comment-avatar {
+        width: 28px;
+        height: 28px;
+        font-size: 11px;
+      }
+      .comment-body {
+        font-size: 13px;
+      }
+
+      /* 8. FORMS & INPUTS: 16px to prevent iOS Zoom */
+      input, select, textarea {
+        font-size: 16px !important;
+        padding: 10px 11px;
+        border-radius: 8px;
+      }
+      .btn-submit {
+        padding: 12px;
+        font-size: 14px;
+      }
+
+      /* 9. MODALS ON MOBILE */
+      .modal-backdrop {
+        padding: 12px;
+      }
+      .modal-card {
+        padding: 18px 16px;
+        border-radius: 14px;
+      }
+
+      /* 10. COORDINATOR PANEL ON MOBILE */
+      #coordPanel > div:nth-child(2) {
+        grid-template-columns: 1fr !important;
+      }
+
+      /* 11. MOBILE BOTTOM BAR (APP FEEL) */
+      .mobile-bottom-nav {
+        display: flex;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(255, 255, 255, 0.96);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-top: 1px solid #e2e8f0;
+        z-index: 99;
+        justify-content: space-around;
+        padding: 6px 0;
+        box-shadow: 0 -3px 12px rgba(0, 0, 0, 0.05);
+      }
+      .mob-nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: #64748b;
+        text-decoration: none;
+        font-size: 11px;
+        font-weight: 700;
+        padding: 4px 10px;
+        border: none;
+        background: none;
+        cursor: pointer;
+        transition: color 0.15s;
+      }
+      .mob-nav-item.active, .mob-nav-item:active {
+        color: var(--primary);
+      }
+      .mob-nav-icon {
+        font-size: 17px;
+        line-height: 1;
+        margin-bottom: 2px;
       }
     }
   </style>
@@ -847,7 +1112,7 @@
     </div>
 
     <!-- 1. LIVE ANNOUNCEMENTS ("WACH GHDA 9ARYIN ?") -->
-    <div class="box">
+    <div class="box" id="announcementsSection">
       <div class="box-header">
         <div class="box-title">📢 Annonces des Professeurs (Wach ghda 9aryin ?)</div>
         <span style="font-size:12px;color:var(--muted);">Mise à jour en direct</span>
@@ -856,7 +1121,7 @@
     </div>
 
     <!-- 2. MODULES & OFFICIAL TIMETABLE -->
-    <div class="box">
+    <div class="box" id="modulesSection">
       <div class="box-header">
         <div class="box-title">📚 Les Modules & Emploi du Temps (2026–2027)</div>
         <div class="tabs">
@@ -961,6 +1226,81 @@
             </tr>
           </tbody>
         </table>
+
+        <!-- Vue Mobile des Cartes d'Emploi du Temps (Affichage automatique sur Smartphone) -->
+        <div class="mobile-schedule-cards">
+          <!-- LUNDI -->
+          <div class="day-card">
+            <div class="day-card-header">
+              <span>🗓️ LUNDI</span>
+              <span style="font-size:11.5px;color:#64748b;font-weight:700;">3 Séances · Salle 8 & 5</span>
+            </div>
+            <div class="day-class-slot salle8">
+              <div class="day-slot-time">
+                <span>🕒 13h00 - 14h30</span>
+                <span class="badge salle8" style="background:#fef3c7;color:#92400e;font-size:11px;">📍 Salle 8</span>
+              </div>
+              <div class="day-slot-title">Droit des affaires</div>
+              <div class="day-slot-prof">👨‍🏫 Pr. LHAROUAL MOHAMED</div>
+            </div>
+            <div class="day-class-slot salle5">
+              <div class="day-slot-time">
+                <span>🕒 14h30 - 16h00</span>
+                <span class="badge salle5" style="background:#dbeafe;color:#1e40af;font-size:11px;">📍 Salle 5</span>
+              </div>
+              <div class="day-slot-title">Droit du travail numérique</div>
+              <div class="day-slot-prof">👩‍🏫 Pr. RAHMOUNE NOUHA</div>
+            </div>
+            <div class="day-class-slot salle5">
+              <div class="day-slot-time">
+                <span>🕒 16h00 - 17h30</span>
+                <span class="badge salle5" style="background:#dbeafe;color:#1e40af;font-size:11px;">📍 Salle 5</span>
+              </div>
+              <div class="day-slot-title">Gouvernance et éthique du numérique</div>
+              <div class="day-slot-prof">👨‍🏫 Pr. CHAKIR MOHAMED</div>
+            </div>
+          </div>
+
+          <!-- MERCREDI -->
+          <div class="day-card">
+            <div class="day-card-header">
+              <span>🗓️ MERCREDI</span>
+              <span style="font-size:11.5px;color:#64748b;font-weight:700;">1 Séance · Salle 5</span>
+            </div>
+            <div class="day-class-slot salle5">
+              <div class="day-slot-time">
+                <span>🕒 11h30 - 13h00</span>
+                <span class="badge salle5" style="background:#dbeafe;color:#1e40af;font-size:11px;">📍 Salle 5</span>
+              </div>
+              <div class="day-slot-title">Droit du commerce électronique</div>
+              <div class="day-slot-prof">👩‍🏫 Pr. BOUSSETTA FATIM EZZAHRA</div>
+            </div>
+          </div>
+
+          <!-- JEUDI -->
+          <div class="day-card">
+            <div class="day-card-header">
+              <span>🗓️ JEUDI</span>
+              <span style="font-size:11.5px;color:#64748b;font-weight:700;">2 Séances · Salle 2BIS</span>
+            </div>
+            <div class="day-class-slot salle2bis">
+              <div class="day-slot-time">
+                <span>🕒 16h00 - 17h30</span>
+                <span class="badge salle2bis" style="background:#f3e8ff;color:#7e22ce;font-size:11px;">📍 Salle 2BIS</span>
+              </div>
+              <div class="day-slot-title">Droit processuel</div>
+              <div class="day-slot-prof">👩‍🏫 Pr. ASSEMAHLI SOUKAINA</div>
+            </div>
+            <div class="day-class-slot salle2bis">
+              <div class="day-slot-time">
+                <span>🕒 17h30 - 19h00</span>
+                <span class="badge salle2bis" style="background:#f3e8ff;color:#7e22ce;font-size:11px;">📍 Salle 2BIS</span>
+              </div>
+              <div class="day-slot-title">Droit des contrats numériques</div>
+              <div class="day-slot-prof">👨‍🏫 Pr. BEYYOUDH MED SAMI</div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -2028,6 +2368,23 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
       } catch(err) {}
     }
 
+    function mobileNavTo(sectionId) {
+      if (sectionId === 'timetableSection') {
+        switchView('TT');
+        const el = document.getElementById('timetableWrap');
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        return;
+      }
+      if (sectionId === 'modulesSection') {
+        if (currentTab === 'TT') switchView('S5');
+        const el = document.getElementById('modulesGrid');
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        return;
+      }
+      const el = document.getElementById(sectionId);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
     // Rendu immédiat (0ms) pour Googlebot et affichage instantané
     loadStoredAnnouncements();
     loadStoredComments();
@@ -2042,5 +2399,25 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
     setInterval(fetchState, 10000);
     setInterval(syncCloudComments, 8000);
   </script>
+
+  <!-- BARRE DE NAVIGATION MOBILE (STYLE APPLICATION SMARTPHONE) -->
+  <nav class="mobile-bottom-nav">
+    <button class="mob-nav-item" onclick="mobileNavTo('announcementsSection')">
+      <span class="mob-nav-icon">📢</span>
+      <span>Annonces</span>
+    </button>
+    <button class="mob-nav-item" onclick="mobileNavTo('modulesSection')">
+      <span class="mob-nav-icon">📚</span>
+      <span>Modules</span>
+    </button>
+    <button class="mob-nav-item" onclick="mobileNavTo('timetableSection')">
+      <span class="mob-nav-icon">🗓️</span>
+      <span>Emploi</span>
+    </button>
+    <button class="mob-nav-item" onclick="mobileNavTo('moduleWorkspace')">
+      <span class="mob-nav-icon">💬</span>
+      <span>Forum</span>
+    </button>
+  </nav>
 </body>
 </html>
