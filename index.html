@@ -250,6 +250,114 @@
       color: white;
       box-shadow: 0 2px 8px rgba(16, 185, 129, 0.35);
     }
+    .theme-toggle-btn {
+      background: rgba(255,255,255,0.18);
+      color: white;
+      border: 1px solid rgba(255,255,255,0.3);
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 15px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .theme-toggle-btn:hover {
+      background: rgba(255,255,255,0.3);
+    }
+    .share-btn {
+      background: rgba(255,255,255,0.18);
+      color: white;
+      border: 1px solid rgba(255,255,255,0.3);
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .share-btn:hover {
+      background: rgba(255,255,255,0.3);
+    }
+    .btn-voice {
+      background: #eff6ff;
+      color: #1d4ed8;
+      border: 1px solid #bfdbfe;
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 11.5px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .btn-voice:hover {
+      background: #dbeafe;
+    }
+    .live-pulse {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #16a34a;
+      box-shadow: 0 0 0 rgba(22, 163, 74, 0.4);
+      animation: pulseDot 1.6s infinite;
+    }
+    @keyframes pulseDot {
+      0% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.7); }
+      70% { box-shadow: 0 0 0 7px rgba(22, 163, 74, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0); }
+    }
+    body.dark-mode {
+      --bg: #0b1120;
+      --card: #1e293b;
+      --border: #334155;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --primary: #60a5fa;
+      --primary-light: #1e293b;
+    }
+    body.dark-mode header {
+      background: #0f172a;
+      border-bottom: 1px solid #334155;
+    }
+    body.dark-mode .sub-panel, body.dark-mode .doc-item, body.dark-mode .module-card {
+      background: #0f172a !important;
+      border-color: #334155 !important;
+      color: #f1f5f9;
+    }
+    body.dark-mode input, body.dark-mode select, body.dark-mode textarea {
+      background: #1e293b !important;
+      color: #f1f5f9 !important;
+      border-color: #475569 !important;
+    }
+    body.dark-mode .comment-item {
+      background: #0f172a;
+      border-color: #334155;
+      color: #f1f5f9;
+    }
+    body.dark-mode .ann-item {
+      background: #0f172a;
+    }
+    body.dark-mode .timetable th, body.dark-mode .timetable td {
+      border-color: #334155;
+    }
+    body.dark-mode .mobile-day-card {
+      background: #0f172a;
+      border-color: #334155;
+    }
+    body.dark-mode .mobile-bottom-nav {
+      background: rgba(15, 23, 42, 0.95);
+      border-top-color: #334155;
+    }
+    body.dark-mode .modal-card {
+      background: #1e293b;
+      color: #f1f5f9;
+      border-color: #334155;
+    }
     .ann-item.salle {
       border-left-color: #9333ea;
       background: #faf5ff;
@@ -977,6 +1085,8 @@
         <p class="brand-sub" style="margin:2px 0 0 0;font-size:13px;color:#cbd5e1;">Faculté des Sciences Juridiques et Politiques (FSJP) — El Kelaâ des Sraghna · Université Cadi Ayyad</p>
       </div>
       <div class="header-actions">
+        <button id="themeToggleBtn" onclick="toggleTheme()" class="theme-toggle-btn" title="Changer de thème">🌙</button>
+        <button onclick="sharePlatform()" class="share-btn" title="Partager la plateforme">📲 Partager</button>
         <button id="coordAccessBtn" class="coord-btn" onclick="handleCoordButtonClick()">
           👑 Espace Délégué
         </button>
@@ -994,7 +1104,7 @@
       <div class="box-header">
         <div>
           <div class="box-title" style="color:#b45309;font-size:18px;">
-            👑 Espace Délégué & Coordinateur de la Promotion — <span id="coordWelcomeName">Salah Boulafaa</span>
+            👑 Espace Délégué & Coordination de la Promotion
           </div>
           <p style="font-size:12.5px;color:#78350f;margin-top:2px;">
             Espace officiel pour diffuser aux étudiants les consignes transmises par les professeurs (Cours maintenu, absence, rattrapage, changement de salle).
@@ -1020,7 +1130,7 @@
               <option value="Pr. ASSEMAHLI SOUKAINA" data-module="s5-m2" data-schedule="Jeudi à 16h00 (Salle 2BIS)">Pr. ASSEMAHLI SOUKAINA (Droit processuel)</option>
               <option value="Pr. BEYYOUDH MED SAMI" data-module="s5-m3" data-schedule="Jeudi à 17h30 (Salle 2BIS)">Pr. BEYYOUDH MED SAMI (Droit des contrats numériques)</option>
               <option value="Administration FSJP El Kelaâ" data-module="ALL" data-schedule="Avis Administratif">Administration FSJP El Kelaâ</option>
-              <option value="Salah Boulafaa (Délégué de Promotion)" data-module="ALL" data-schedule="Avis Général Promo">Coordination de la Promotion (Délégué)</option>
+              <option value="Délégué de Promotion" data-module="ALL" data-schedule="Avis Général Promo">Coordination de la Promotion (Délégué)</option>
             </select>
 
             <label style="font-size:12px;font-weight:700;color:#475569;display:block;margin-bottom:4px;">2. Module / Matière concernée :</label>
@@ -1359,60 +1469,102 @@
       </div>
     </div>
 
-    <!-- 3. SELECTED MODULE DETAILS: PDF + STUDENT DISCUSSION -->
+    <!-- 3. SUPPORTS DE COURS PDF PAR MODULE -->
     <div class="box" id="moduleWorkspace">
       <div class="box-header">
         <div>
-          <div class="box-title" id="selectedModTitle">Sélectionnez un module</div>
-          <div style="font-size:13px;color:var(--muted);" id="selectedModMeta"></div>
+          <div class="box-title" id="selectedModTitle">📄 Supports de Cours & Résumés PDF</div>
+          <div style="font-size:13px;color:var(--muted);" id="selectedModMeta">Sélectionnez une matière pour télécharger les polycopiés et résumés</div>
+        </div>
+        <div>
+          <select id="workspaceModuleSelect" onchange="onWorkspaceModuleSelectChange()" style="font-weight:700;padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:13px;cursor:pointer;">
+            <option value="s5-m1">⚖️ Droit des affaires (Pr. LHAROUAL)</option>
+            <option value="s5-m5">💼 Droit du travail numérique (Pr. RAHMOUNE)</option>
+            <option value="s5-m6">🛡️ Gouvernance et éthique (Pr. CHAKIR)</option>
+            <option value="s5-m4">🛒 Droit du commerce élec. (Pr. BOUSSETTA)</option>
+            <option value="s5-m2">🏛️ Droit processuel (Pr. ASSEMAHLI)</option>
+            <option value="s5-m3">📜 Droit des contrats num. (Pr. BEYYOUDH)</option>
+            <option value="s5-m7">🇬🇧 Langues étrangères (Anglais)</option>
+          </select>
         </div>
       </div>
 
-      <div class="workspace-grid">
-        <!-- Left: Course PDFs -->
-        <div class="sub-panel">
-          <h3>
-            <span>📄 Supports PDF du Module</span>
-            <span id="docCountBadge" style="font-size:12px;color:var(--muted);">0 PDF</span>
+      <div class="sub-panel" style="background:var(--card);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <h3 style="margin:0;font-size:15px;display:flex;align-items:center;gap:6px;">
+            <span>📁 Fichiers PDF disponibles pour ce module</span>
           </h3>
-          <div id="moduleDocsList"></div>
+          <span id="docCountBadge" style="font-size:12px;color:var(--muted);background:var(--primary-light);padding:3px 10px;border-radius:12px;font-weight:700;">0 PDF</span>
         </div>
+        <div id="moduleDocsList"></div>
+      </div>
+    </div>
 
-        <!-- Right: Student & Prof Discussion Forum -->
-        <div class="sub-panel" style="display:flex;flex-direction:column;justify-content:space-between;">
-          <div>
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:6px;">
-              <h3 style="margin:0;font-size:15px;display:flex;align-items:center;gap:6px;">
-                <span>💬 Forum & Questions des Étudiants</span>
-                <span style="font-size:11px;background:#dcfce7;color:#166534;padding:2px 7px;border-radius:10px;font-weight:700;">🟢 En Direct</span>
-              </h3>
-              <span id="commentCountBadge" style="font-size:11.5px;background:#e0f2fe;color:#0369a1;padding:2px 8px;border-radius:10px;font-weight:700;">0 message(s)</span>
-            </div>
-
-            <!-- Scope Toggle: Ce Module VS Toute la Promo + Outil Nettoyage des Messages Anciens -->
-            <div style="display:flex;gap:6px;margin-bottom:10px;align-items:center;flex-wrap:wrap;">
-              <button type="button" id="chatScopeModBtn" class="tab-btn active" style="font-size:12px;padding:6px 12px;cursor:pointer;" onclick="setChatScope('module')">📘 Ce Module</button>
-              <button type="button" id="chatScopePromoBtn" class="tab-btn" style="font-size:12px;padding:6px 12px;cursor:pointer;" onclick="setChatScope('promo')">💬 Salon Général Promo</button>
-              <button type="button" id="cleanChatBtn" class="tab-btn" style="font-size:12px;padding:6px 10px;cursor:pointer;background:#fef2f2;color:#991b1b;border:1px solid #fecaca;margin-left:auto;display:flex;align-items:center;gap:4px;" onclick="openCleanChatModal()" title="Nettoyer les messages anciens">
-                🧹 Nettoyer le chat
-              </button>
-            </div>
-
-            <div id="moduleCommentsList" class="comment-list"></div>
+    <!-- 4. SALON GÉNÉRAL & FORUM OUVERT DE LA PROMOTION (EN DIRECT LIVE) -->
+    <div class="box" id="forumSection">
+      <div class="box-header">
+        <div>
+          <div class="box-title" style="font-size:18px;">
+            <span>💬 Salon Général & Forum Ouvert de la Promotion</span>
+            <span style="font-size:11.5px;background:#dcfce7;color:#166534;border:1px solid #86efac;padding:3px 10px;border-radius:20px;font-weight:700;display:inline-flex;align-items:center;gap:6px;">
+              <span class="live-pulse"></span>🟢 En Direct (Live Synchro 0s)
+            </span>
           </div>
-
-          <form onsubmit="submitComment(event)" style="margin-top:10px;border-top:1px solid #e2e8f0;padding-top:10px;">
-            <div style="display:flex;gap:8px;margin-bottom:6px;">
-              <input type="text" id="commentAuthor" placeholder="Votre Nom & Prénom" style="flex:1;margin-bottom:0;" required />
-            </div>
-            <textarea id="commentMessage" rows="2" placeholder="Posez une question, partagez une information ou répondez à vos camarades..." style="margin-bottom:6px;" required></textarea>
-            <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
-              <span id="commentToast" style="font-size:12px;color:#16a34a;font-weight:700;display:none;">✅ Message envoyé et synchronisé avec succès !</span>
-              <button type="submit" class="btn-submit" style="margin-top:0;width:auto;padding:8px 18px;margin-left:auto;">Envoyer le message 🚀</button>
-            </div>
-          </form>
+          <p style="font-size:13px;color:var(--muted);margin-top:2px;">
+            Espace d'échange et de discussion ouvert à tous les étudiants de la promotion — Posez vos questions, partagez vos remarques ou discutez de n'importe quel module sans restriction !
+          </p>
+        </div>
+        <div>
+          <span id="commentCountBadge" style="font-size:12px;background:#e0f2fe;color:#0369a1;padding:4px 10px;border-radius:12px;font-weight:700;">0 message(s)</span>
         </div>
       </div>
+
+      <!-- Filter bar: Tous les sujets / Filtrer par module -->
+      <div style="display:flex;gap:6px;margin-bottom:14px;align-items:center;flex-wrap:wrap;">
+        <button type="button" class="tab-btn active" id="chatFilterALL" onclick="setForumFilter('ALL')">🌐 Tous les Sujets (Open)</button>
+        <button type="button" class="tab-btn" id="chatFilterS5M1" onclick="setForumFilter('s5-m1')">⚖️ Droit des affaires</button>
+        <button type="button" class="tab-btn" id="chatFilterS5M5" onclick="setForumFilter('s5-m5')">💼 Droit du travail</button>
+        <button type="button" class="tab-btn" id="chatFilterS5M6" onclick="setForumFilter('s5-m6')">🛡️ Gouvernance</button>
+        <button type="button" class="tab-btn" id="chatFilterS5M4" onclick="setForumFilter('s5-m4')">🛒 E-Commerce</button>
+        <button type="button" class="tab-btn" id="chatFilterS5M2" onclick="setForumFilter('s5-m2')">🏛️ Processuel</button>
+        <button type="button" class="tab-btn" id="chatFilterS5M3" onclick="setForumFilter('s5-m3')">📜 Contrats</button>
+        <button type="button" class="tab-btn" id="chatFilterGEN" onclick="setForumFilter('GEN')">💬 Général Promo</button>
+        <button type="button" class="tab-btn" style="font-size:12px;padding:6px 10px;cursor:pointer;background:#fef2f2;color:#991b1b;border:1px solid #fecaca;margin-left:auto;display:flex;align-items:center;gap:4px;" onclick="openCleanChatModal()" title="Nettoyer les messages anciens">
+          🧹 Nettoyer le chat
+        </button>
+      </div>
+
+      <!-- Message stream container -->
+      <div id="moduleCommentsList" class="comment-list" style="max-height:480px;overflow-y:auto;padding-right:6px;"></div>
+
+      <!-- Live message submission form -->
+      <form onsubmit="submitComment(event)" style="margin-top:14px;border-top:1px solid var(--border);padding-top:14px;">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:10px;margin-bottom:8px;">
+          <div>
+            <label style="font-size:11.5px;font-weight:700;color:var(--muted);display:block;margin-bottom:3px;">Votre Nom & Prénom :</label>
+            <input type="text" id="commentAuthor" placeholder="Votre Nom & Prénom" style="margin-bottom:0;" required />
+          </div>
+          <div>
+            <label style="font-size:11.5px;font-weight:700;color:var(--muted);display:block;margin-bottom:3px;">Sujet / Matière concernée :</label>
+            <select id="commentTopicSelect" style="margin-bottom:0;font-weight:600;">
+              <option value="GEN">💬 Général / Discussion Libre Promotion</option>
+              <option value="s5-m1">⚖️ Droit des affaires (Pr. LHAROUAL)</option>
+              <option value="s5-m5">💼 Droit du travail numérique (Pr. RAHMOUNE)</option>
+              <option value="s5-m6">🛡️ Gouvernance et éthique (Pr. CHAKIR)</option>
+              <option value="s5-m4">🛒 Droit du commerce électronique (Pr. BOUSSETTA)</option>
+              <option value="s5-m2">🏛️ Droit processuel (Pr. ASSEMAHLI)</option>
+              <option value="s5-m3">📜 Droit des contrats numériques (Pr. BEYYOUDH)</option>
+              <option value="s5-m7">🇬🇧 Langues étrangères (Anglais)</option>
+              <option value="REVISIONS">📢 Révisions, Examens & Avis de classe</option>
+            </select>
+          </div>
+        </div>
+        <textarea id="commentMessage" rows="2" placeholder="Posez une question, partagez une information ou répondez à vos camarades..." style="margin-bottom:8px;" required></textarea>
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">
+          <span id="commentToast" style="font-size:12px;color:#16a34a;font-weight:700;display:none;">⚡ Message diffusé en direct (0s) !</span>
+          <button type="submit" class="btn-submit" style="margin-top:0;width:auto;padding:10px 22px;margin-left:auto;background:var(--primary);font-weight:700;">Envoyer en Direct 🚀</button>
+        </div>
+      </form>
     </div>
 
     <!-- 4. GUIDE & PRÉSENTATION DE LA FILIÈRE (OPTIMISÉ SEO GOOGLE TOP 1) -->
@@ -1565,24 +1717,37 @@
       {
         id: 100,
         module_id: "ALL",
-        prof_name: "Salah Boulafaa",
+        prof_name: "Délégué de Promotion",
         is_coord: true,
         prof_source: "Coordination de la Promotion",
         status_type: "info",
         date_label: "Avis Officiel · Année 2026-2027",
         message: "Bienvenue à tous les étudiants de notre promotion ! Cet espace est dédié aux annonces officielles de la Licence transmises par les professeurs (cours maintenus, absences, rattrapages et salles).",
-        created_at: "Délégué Salah Boulafaa"
+        created_at: "Délégué de Promotion"
       },
       { id: 1, module_id: "s5-m1", prof_name: "Pr. LHAROUAL MOHAMED", status_type: "present", date_label: "🟢 Lundi 12/10/2026 à 13h00 (Salle 8)", message: "Bienvenue aux étudiants de la Licence d'Excellence Droit Privé et Transformation Digitale. La première séance de Droit des affaires aura lieu le Lundi à 13h00 en Salle 8.", created_at: "Officiel FSJP" },
       { id: 2, module_id: "s5-m3", prof_name: "Pr. BEYYOUDH MED SAMI", status_type: "present", date_label: "🟢 Jeudi 17h30 (Salle 2BIS)", message: "La séance de Droit des contrats numériques est programmée chaque Jeudi de 17h30 à 19h00 en Salle 2BIS.", created_at: "Officiel FSJP" }
     ];
 
     const DEFAULT_COMMENTS = [
-      { id: "c1", module_id: "s5-m1", author: "Salah Boulafaa", role: "coord", message: "Salam les amis ! Bienvenue sur la plateforme officielle de notre promotion. Posez vos questions et partagez vos remarques ici.", created_at: "10/10/2026 à 14h00" },
+      { id: "c1", module_id: "s5-m1", author: "Délégué de Promotion", role: "coord", message: "Salam les amis ! Bienvenue sur la plateforme officielle de notre promotion. Posez vos questions et partagez vos remarques ici.", created_at: "10/10/2026 à 14h00" },
       { id: "c2", module_id: "s5-m1", author: "Pr. LHAROUAL MOHAMED", role: "prof", message: "Bienvenue à toutes et à tous. Les supports de cours PDF seront publiés directement dans chaque module.", created_at: "10/10/2026 à 16h30" },
-      { id: "c3", module_id: "ALL", author: "Salah Boulafaa", role: "coord", message: "📢 Salon Général ouvert à toute la promotion ! N'hésitez pas à poser vos questions sur l'emploi du temps ou les cours.", created_at: "11/10/2026 à 10h00" },
-      { id: "c4", module_id: "ALL", author: "Étudiant FSJP", role: "student", message: "Tbarkellah 3lik a monasi9, had l-plateforme nfa3atna bzaf bach ntb3o les cours !", created_at: "11/10/2026 à 11h15" }
+      { id: "c3", module_id: "GEN", author: "Délégué de Promotion", role: "coord", message: "📢 Salon Général ouvert à toute la promotion ! N'hésitez pas à poser vos questions sur l'emploi du temps ou les cours.", created_at: "11/10/2026 à 10h00" },
+      { id: "c4", module_id: "GEN", author: "Étudiant FSJP", role: "student", message: "Tbarkellah 3lik a monasi9, had l-plateforme nfa3atna bzaf bach ntb3o les cours !", created_at: "11/10/2026 à 11h15" }
     ];
+
+    const TOPIC_LABELS = {
+      'ALL': '💬 Général',
+      'GEN': '💬 Général Promo',
+      's5-m1': '⚖️ Droit des affaires',
+      's5-m5': '💼 Droit du travail num.',
+      's5-m6': '🛡️ Gouvernance & éthique',
+      's5-m4': '🛒 Commerce électronique',
+      's5-m2': '🏛️ Droit processuel',
+      's5-m3': '📜 Contrats numériques',
+      's5-m7': '🇬🇧 Langues étrangères',
+      'REVISIONS': '📢 Révisions & Examens'
+    };
 
     let appState = {
       modules: DEFAULT_MODULES,
@@ -1592,7 +1757,8 @@
     };
     let currentTab = 'S5';
     let selectedModuleId = 's5-m1';
-    let chatScope = 'module';
+    let selectedDocModuleId = 's5-m1';
+    let forumFilter = 'ALL';
     const NTFY_TOPIC = 'lexdigit_uca_sraghna_forum_2026';
     let profSession = null;
     let coordSession = null;
@@ -1752,7 +1918,7 @@
           : '';
 
         const coordBadge = a.is_coord
-          ? `<span class="badge" style="background:#fef3c7;color:#92400e;border:1px solid #f59e0b;">👑 Avis Délégué · Salah Boulafaa</span>`
+          ? `<span class="badge" style="background:#fef3c7;color:#92400e;border:1px solid #f59e0b;">👑 Avis Délégué de Promotion</span>`
           : '';
 
         const sourceText = a.prof_source
@@ -1771,7 +1937,10 @@
               <div style="font-size:14px;margin-bottom:5px;line-height:1.5;">${a.message}</div>
               <div style="font-size:11.5px;color:var(--muted);">${sourceText} · ${a.created_at}</div>
             </div>
-            ${delBtn}
+            <div style="display:flex;gap:6px;align-items:center;">
+              <button class="btn-voice" onclick="speakAnnouncement('${a.id}')" title="Écouter l'annonce">🔊 Écouter</button>
+              ${delBtn}
+            </div>
           </div>
         `;
       }).join('');
@@ -1805,58 +1974,100 @@
       }).join('');
     }
 
-    function renderSelectedModuleWorkspace() {
-      const mod = appState.modules.find(m => m.id === selectedModuleId) || appState.modules[0];
+    function onWorkspaceModuleSelectChange() {
+      const sel = document.getElementById('workspaceModuleSelect');
+      if (sel) {
+        selectedDocModuleId = sel.value;
+        renderSelectedModuleDocs();
+      }
+    }
+
+    function renderSelectedModuleDocs() {
+      const mod = appState.modules.find(m => m.id === selectedDocModuleId) || appState.modules[0];
       if (!mod) return;
 
-      document.getElementById('selectedModTitle').textContent = `📘 ${mod.title}`;
-      document.getElementById('selectedModMeta').textContent = `${mod.professor}  ·  ${mod.room}  ·  ${mod.schedule}`;
+      const titleEl = document.getElementById('selectedModTitle');
+      const metaEl = document.getElementById('selectedModMeta');
+      const selEl = document.getElementById('workspaceModuleSelect');
+      if (titleEl) titleEl.textContent = `📄 Supports PDF — ${mod.title}`;
+      if (metaEl) metaEl.textContent = `${mod.professor}  ·  ${mod.room}  ·  ${mod.schedule}`;
+      if (selEl) selEl.value = mod.id;
 
       const docs = appState.documents.filter(d => d.module_id === mod.id);
-      document.getElementById('docCountBadge').textContent = `${docs.length} PDF`;
+      const countEl = document.getElementById('docCountBadge');
+      if (countEl) countEl.textContent = `${docs.length} PDF`;
       const docsEl = document.getElementById('moduleDocsList');
-      if (!docs.length) {
-        docsEl.innerHTML = `<div style="color:var(--muted);font-size:13px;padding:12px 0;">Aucun support PDF déposé pour ce module pour l'instant.</div>`;
-      } else {
-        docsEl.innerHTML = docs.map(d => {
-          const delBtn = profSession
-            ? `<button class="btn-delete" onclick="deleteDoc(${d.id})">✕</button>`
-            : '';
-          return `
-            <div class="doc-item">
-              <div class="doc-info">
-                <strong>📕 ${d.title}</strong>
-                <span>Déposé par ${d.prof_name} · ${d.file_size} · ${d.uploaded_at}</span>
+      if (docsEl) {
+        if (!docs.length) {
+          docsEl.innerHTML = `<div style="color:var(--muted);font-size:13px;padding:12px 0;">Aucun support PDF déposé pour ce module pour l'instant.</div>`;
+        } else {
+          docsEl.innerHTML = docs.map(d => {
+            const delBtn = profSession
+              ? `<button class="btn-delete" onclick="deleteDoc(${d.id})">✕</button>`
+              : '';
+            return `
+              <div class="doc-item">
+                <div class="doc-info">
+                  <strong>📕 ${d.title}</strong>
+                  <span>Déposé par ${d.prof_name} · ${d.file_size} · ${d.uploaded_at}</span>
+                </div>
+                <div style="display:flex;gap:6px;align-items:center;">
+                  <a class="btn-download" href="/uploads/${encodeURIComponent(d.filename)}" target="_blank" download>⬇ Télécharger</a>
+                  ${delBtn}
+                </div>
               </div>
-              <div style="display:flex;gap:6px;align-items:center;">
-                <a class="btn-download" href="/uploads/${encodeURIComponent(d.filename)}" target="_blank" download>⬇ Télécharger</a>
-                ${delBtn}
-              </div>
-            </div>
-          `;
-        }).join('');
+            `;
+          }).join('');
+        }
+      }
+    }
+
+    function setForumFilter(topic) {
+      forumFilter = topic;
+      const buttons = document.querySelectorAll('#forumSection .tab-btn');
+      buttons.forEach(btn => {
+        if (btn.id === 'cleanChatBtn' || (btn.getAttribute('onclick') || '').includes('openCleanChatModal')) return;
+        btn.classList.remove('active');
+      });
+      const filterIdMap = {
+        'ALL': 'chatFilterALL',
+        's5-m1': 'chatFilterS5M1',
+        's5-m5': 'chatFilterS5M5',
+        's5-m6': 'chatFilterS5M6',
+        's5-m4': 'chatFilterS5M4',
+        's5-m2': 'chatFilterS5M2',
+        's5-m3': 'chatFilterS5M3',
+        'GEN': 'chatFilterGEN'
+      };
+      const activeBtn = document.getElementById(filterIdMap[topic] || 'chatFilterALL');
+      if (activeBtn) activeBtn.classList.add('active');
+
+      const topicSel = document.getElementById('commentTopicSelect');
+      if (topicSel && topic !== 'ALL') {
+        topicSel.value = topic;
       }
 
-      // Commentaires selon chatScope ('module' ou 'promo')
-      const isPromo = chatScope === 'promo';
-      const comments = appState.comments.filter(c => isPromo ? (c.module_id === 'ALL' || !c.module_id || c.module_id === 'promo') : (c.module_id === mod.id));
-      document.getElementById('commentCountBadge').textContent = `${comments.length} message(s)`;
+      renderForumComments(false);
+    }
 
-      // Boutons Scope toggle
-      const modBtn = document.getElementById('chatScopeModBtn');
-      const promoBtn = document.getElementById('chatScopePromoBtn');
-      if (modBtn && promoBtn) {
-        modBtn.classList.toggle('active', !isPromo);
-        promoBtn.classList.toggle('active', isPromo);
-        modBtn.textContent = `📘 ${mod.title}`;
-      }
-
+    function renderForumComments(shouldScrollToBottom) {
       const commEl = document.getElementById('moduleCommentsList');
+      if (!commEl) return;
+
+      const comments = appState.comments.filter(c => {
+        if (forumFilter === 'ALL') return true; // SHOW EVERY MESSAGE IN OPEN MODE!
+        if (forumFilter === 'GEN') return (!c.module_id || c.module_id === 'ALL' || c.module_id === 'GEN');
+        return c.module_id === forumFilter;
+      });
+
+      const countBadge = document.getElementById('commentCountBadge');
+      if (countBadge) countBadge.textContent = `${comments.length} message(s)`;
+
       if (!comments.length) {
-        const emptyMsg = isPromo
-          ? "Aucun message dans le salon général. Écrivez le premier mot pour vos camarades !"
-          : `Aucune question pour le module "${mod.title}". Posez votre question ci-dessous !`;
-        commEl.innerHTML = `<div style="color:var(--muted);font-size:13px;padding:24px 0;text-align:center;">${emptyMsg}</div>`;
+        const emptyMsg = forumFilter === 'ALL'
+          ? "Aucun message pour le moment. Soyez le premier à poser une question ou partager une info avec vos camarades !"
+          : `Aucun message dans cette section (${TOPIC_LABELS[forumFilter] || forumFilter}). Écrivez le premier mot ci-dessous !`;
+        commEl.innerHTML = `<div style="color:var(--muted);font-size:13.5px;padding:32px 0;text-align:center;">💬 ${emptyMsg}</div>`;
       } else {
         commEl.innerHTML = comments.map(c => {
           const isProf = c.role === 'prof';
@@ -1876,7 +2087,6 @@
             itemClass = 'prof-comment';
           }
 
-          // Initiales pour avatar
           const authorName = (c.author || c.author_name || 'Étudiant').trim();
           const words = authorName.split(' ').filter(w => w.length > 0);
           const initials = (words[0] ? words[0][0] : 'E') + (words[1] ? words[1][0] : '');
@@ -1887,6 +2097,8 @@
             ? `<button class="btn-delete" style="font-size:11px;padding:2px 6px;margin-left:8px;" onclick="deleteComment('${c.id}')" title="Supprimer ce message">✕</button>`
             : '';
 
+          const topicBadge = TOPIC_LABELS[c.module_id] || TOPIC_LABELS['GEN'];
+
           return `
             <div class="comment-item ${itemClass}">
               <div class="comment-avatar ${avatarClass}">${isCoord ? '👑' : (isProf ? '👨‍🏫' : initials.toUpperCase())}</div>
@@ -1895,6 +2107,7 @@
                   <div class="comment-author">
                     <span>${authorName}</span>
                     ${roleBadge}
+                    <span style="font-size:10.5px;background:#f1f5f9;color:#334155;border:1px solid #cbd5e1;padding:1px 6px;border-radius:4px;font-weight:600;">${topicBadge}</span>
                   </div>
                   <div>
                     <span>${c.created_at || "À l'instant"}</span>
@@ -1908,7 +2121,18 @@
         }).join('');
       }
 
+      if (shouldScrollToBottom) {
+        setTimeout(() => {
+          commEl.scrollTop = commEl.scrollHeight;
+        }, 50);
+      }
+
       initStudentName();
+    }
+
+    function renderSelectedModuleWorkspace() {
+      renderSelectedModuleDocs();
+      renderForumComments(false);
     }
 
     function getMyCommentIds() {
@@ -2119,9 +2343,9 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
     }
 
     const CLIENT_PROF_CODES = {
-      "SALAH2026": { prof_name: "Salah Boulafaa (Délégué)", role: "coordinator", is_coord: true, module_id: "ALL" },
-      "COORD2026": { prof_name: "Salah Boulafaa (Délégué)", role: "coordinator", is_coord: true, module_id: "ALL" },
-      "DELEGUE2026": { prof_name: "Salah Boulafaa (Délégué)", role: "coordinator", is_coord: true, module_id: "ALL" },
+      "SALAH2026": { prof_name: "Délégué de la Promotion", role: "coordinator", is_coord: true, module_id: "ALL" },
+      "COORD2026": { prof_name: "Délégué de la Promotion", role: "coordinator", is_coord: true, module_id: "ALL" },
+      "DELEGUE2026": { prof_name: "Délégué de la Promotion", role: "coordinator", is_coord: true, module_id: "ALL" },
       "FSJP2026": { prof_name: "Pr. LHAROUAL MOHAMED (Coordonnateur)", module_id: "s5-m1" },
       "LHAROUAL2026": { prof_name: "Pr. LHAROUAL MOHAMED", module_id: "s5-m1" },
       "ASSEMAHLI2026": { prof_name: "Pr. ASSEMAHLI SOUKAINA", module_id: "s5-m2" },
@@ -2172,14 +2396,14 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
       document.getElementById('coordLoginError').style.display = 'none';
       coordSession = {
         code: code,
-        name: data.prof_name || "Salah Boulafaa",
+        name: data.prof_name || "Délégué de la Promotion",
         role: "coordinator"
       };
       closeCoordLoginModal();
 
       const btn = document.getElementById('coordAccessBtn');
       btn.classList.add('unlocked');
-      btn.textContent = `👑 Espace Délégué (${coordSession.name})`;
+      btn.textContent = `👑 Espace Délégué (Connecté)`;
 
       document.getElementById('coordWelcomeName').textContent = coordSession.name;
       document.getElementById('coordPanel').style.display = 'block';
@@ -2194,7 +2418,7 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
       document.getElementById('coordPanel').style.display = 'none';
       const btn = document.getElementById('coordAccessBtn');
       btn.classList.remove('unlocked');
-      btn.textContent = '👑 Espace Délégué (Salah)';
+      btn.textContent = '👑 Espace Délégué';
       renderAnnouncements();
     }
 
@@ -2263,7 +2487,7 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
 📝 *Détails / Consigne :*
 ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
 ────────────────────────
-👑 *Délégué de la Promotion :* Salah Boulafaa
+👑 *Délégué de la Promotion :* Coordination des Étudiants
 🌐 *Plateforme Officielle :* https://salahboulafaa34-hue.github.io/lexdigit-uca-/`;
 
       const out = document.getElementById('whatsappOutput');
@@ -2309,7 +2533,7 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
         status_type: status,
         date_label: dateVal,
         message: msgVal,
-        created_at: "Délégué Salah Boulafaa · À l'instant"
+        created_at: "Délégué de la Promotion · À l'instant"
       };
 
       try {
@@ -2525,8 +2749,10 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
       e.preventDefault();
       const authorInp = document.getElementById('commentAuthor');
       const msgInp = document.getElementById('commentMessage');
-      const author = authorInp.value.trim();
-      const message = msgInp.value.trim();
+      const topicSel = document.getElementById('commentTopicSelect');
+      const author = (authorInp ? authorInp.value : '').trim();
+      const message = (msgInp ? msgInp.value : '').trim();
+      const topic = topicSel ? topicSel.value : 'GEN';
       if (!author || !message) return;
 
       // Mémoriser le nom de l'étudiant
@@ -2547,12 +2773,10 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
       const month = String(now.getMonth() + 1).padStart(2, '0');
       const timeStr = `${day}/${month} à ${hours}:${mins}`;
 
-      const targetModId = chatScope === 'promo' ? 'ALL' : selectedModuleId;
-
       const newComm = {
         id: 'c_' + Date.now() + '_' + Math.floor(Math.random()*1000),
         timestamp: Date.now(),
-        module_id: targetModId,
+        module_id: topic,
         author: author,
         author_name: author,
         role: role,
@@ -2563,11 +2787,11 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
       // Mémoriser l'ID pour autoriser la suppression par son auteur
       addMyCommentId(newComm.id);
 
-      // 1. Ajout immédiat (0ms) à l'affichage
+      // 1. Ajout immédiat (0ms) à l'affichage du posteur
       appState.comments.push(newComm);
       saveStoredComments();
-      msgInp.value = '';
-      renderSelectedModuleWorkspace();
+      if (msgInp) msgInp.value = '';
+      renderForumComments(true);
 
       // Toast de confirmation
       const toast = document.getElementById('commentToast');
@@ -2576,7 +2800,7 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
         setTimeout(() => { toast.style.display = 'none'; }, 3000);
       }
 
-      // 2. Publication instantanée dans le Cloud (ntfy.sh) pour tous les étudiants
+      // 2. Publication instantanée dans le Cloud (ntfy.sh) pour tous les autres étudiants
       fetch(`https://ntfy.sh/${NTFY_TOPIC}`, {
         method: 'POST',
         body: JSON.stringify(newComm)
@@ -2587,7 +2811,7 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          module_id: targetModId,
+          module_id: topic,
           author,
           role,
           access_code: profSession ? profSession.code : (coordSession ? coordSession.code : ''),
@@ -2602,7 +2826,7 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
       addDeletedCommentIds(strId);
       appState.comments = appState.comments.filter(c => String(c.id) !== strId);
       saveStoredComments();
-      renderSelectedModuleWorkspace();
+      renderForumComments(false);
 
       // Diffuser l'ordre de suppression sur ntfy
       fetch(`https://ntfy.sh/${NTFY_TOPIC}`, {
@@ -2611,16 +2835,11 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
       }).catch(() => {});
     }
 
-    function setChatScope(scope) {
-      chatScope = scope;
-      renderSelectedModuleWorkspace();
-    }
-
     function initStudentName() {
       const inp = document.getElementById('commentAuthor');
       if (!inp) return;
       if (coordSession) {
-        inp.value = coordSession.name + ' (Délégué)';
+        inp.value = 'Délégué de Promotion';
         inp.readOnly = true;
       } else if (profSession) {
         inp.value = profSession.prof_name;
@@ -2630,6 +2849,63 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
         if (saved && !inp.value) inp.value = saved;
         inp.readOnly = false;
       }
+    }
+
+    // STREAM LIVE TEMPS RÉEL (Server-Sent Events via ntfy.sh) : 0 SECONDE DE RETARD !
+    let liveEventSource = null;
+    function initLiveChatStream() {
+      if (!window.EventSource) return;
+      if (liveEventSource) {
+        try { liveEventSource.close(); } catch(e){}
+      }
+      try {
+        liveEventSource = new EventSource(`https://ntfy.sh/${NTFY_TOPIC}/sse`);
+        liveEventSource.onmessage = function(event) {
+          try {
+            const item = JSON.parse(event.data);
+            if (item.event === 'message' && item.message) {
+              handleIncomingLiveComment(item.message, item.id);
+            }
+          } catch(e){}
+        };
+        liveEventSource.onerror = function() {
+          try { liveEventSource.close(); } catch(e){}
+          setTimeout(initLiveChatStream, 3500);
+        };
+      } catch(e){}
+    }
+
+    function handleIncomingLiveComment(rawMsg, eventId) {
+      try {
+        const msgObj = typeof rawMsg === 'string' ? JSON.parse(rawMsg) : rawMsg;
+        if (msgObj.action === 'delete_comment' && msgObj.target_id) {
+          addDeletedCommentIds(msgObj.target_id);
+          appState.comments = appState.comments.filter(c => String(c.id) !== String(msgObj.target_id));
+          saveStoredComments();
+          renderForumComments(false);
+          return;
+        }
+        if (msgObj.action === 'bulk_delete' && Array.isArray(msgObj.deleted_ids)) {
+          addDeletedCommentIds(msgObj.deleted_ids);
+          const delSet = new Set(msgObj.deleted_ids.map(String));
+          appState.comments = appState.comments.filter(c => !delSet.has(String(c.id)));
+          saveStoredComments();
+          renderForumComments(false);
+          return;
+        }
+
+        const strId = String(msgObj.id || eventId);
+        const deletedIds = getDeletedCommentIds();
+        if (deletedIds.has(strId)) return;
+
+        const exists = appState.comments.some(c => String(c.id) === strId);
+        if (!exists) {
+          msgObj.id = strId;
+          appState.comments.push(msgObj);
+          saveStoredComments();
+          renderForumComments(true);
+        }
+      } catch(e){}
     }
 
     async function syncCloudComments() {
@@ -2655,7 +2931,6 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
               if (item.event === 'message' && item.message) {
                 const msgObj = JSON.parse(item.message);
 
-                // Ordres de suppression reçus du cloud
                 if (msgObj.action === 'delete_comment' && msgObj.target_id) {
                   addDeletedCommentIds(msgObj.target_id);
                   if (map.has(String(msgObj.target_id))) {
@@ -2676,7 +2951,6 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
                 }
 
                 const strId = String(msgObj.id || item.id);
-                // Si ce message a été supprimé, ne jamais le réinsérer !
                 if (deletedIds.has(strId)) continue;
 
                 if (!map.has(strId)) {
@@ -2691,10 +2965,85 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
           if (hasNew || map.size !== appState.comments.length) {
             appState.comments = Array.from(map.values());
             saveStoredComments();
-            renderSelectedModuleWorkspace();
+            renderForumComments(false);
           }
         }
       } catch(err) {}
+    }
+
+    // SYNTHÈSE VOCALE INTELLIGENTE : ÉCOUTER LES ANNONCES
+    function speakAnnouncement(id) {
+      const ann = appState.announcements.find(a => String(a.id) === String(id));
+      if (!ann) return;
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const textToRead = `${ann.prof_name || ''}. ${ann.date_label || ''}. ${ann.message || ''}`;
+        const utterance = new SpeechSynthesisUtterance(textToRead);
+        utterance.lang = 'fr-FR';
+        utterance.rate = 0.95;
+        window.speechSynthesis.speak(utterance);
+      } else {
+        alert("La synthèse vocale n'est pas supportée sur ce navigateur.");
+      }
+    }
+
+    // RECHERCHE INSTANTANÉE DANS LES MODULES ET L'EMPLOI DU TEMPS
+    function filterModulesAndSchedule() {
+      const q = (document.getElementById('moduleSearchInput')?.value || '').trim().toLowerCase();
+      const cards = document.querySelectorAll('.module-card');
+      cards.forEach(card => {
+        const text = card.textContent.toLowerCase();
+        card.style.display = (!q || text.includes(q)) ? 'flex' : 'none';
+      });
+      const slots = document.querySelectorAll('.tt-slot, .day-class-slot');
+      slots.forEach(slot => {
+        const text = slot.textContent.toLowerCase();
+        if (!q) {
+          slot.style.opacity = '1';
+          slot.style.outline = 'none';
+        } else if (text.includes(q)) {
+          slot.style.opacity = '1';
+          slot.style.outline = '2px solid #f59e0b';
+        } else {
+          slot.style.opacity = '0.35';
+          slot.style.outline = 'none';
+        }
+      });
+    }
+
+    // MODE SOMBRE (DARK MODE) & THÈME
+    function toggleTheme() {
+      const isDark = document.body.classList.toggle('dark-mode');
+      localStorage.setItem('lexdigit_theme', isDark ? 'dark' : 'light');
+      const btn = document.getElementById('themeToggleBtn');
+      if (btn) btn.textContent = isDark ? '☀️' : '🌙';
+    }
+
+    function initTheme() {
+      const saved = localStorage.getItem('lexdigit_theme');
+      if (saved === 'dark') {
+        document.body.classList.add('dark-mode');
+        const btn = document.getElementById('themeToggleBtn');
+        if (btn) btn.textContent = '☀️';
+      }
+    }
+
+    // PARTAGER LA PLATEFORME SUR WHATSAPP
+    function sharePlatform() {
+      const shareData = {
+        title: "LexDigit FSJP El Kelaâ - UCA",
+        text: "Plateforme officielle de la Licence Droit Privé et Transformation Digitale (FSJP El Kelaâ · UCA) : Cours, emplois du temps et annonces en direct !",
+        url: window.location.href
+      };
+      if (navigator.share) {
+        navigator.share(shareData).catch(() => {});
+      } else {
+        navigator.clipboard.writeText(window.location.href).then(() => {
+          alert("📋 Lien officiel de la plateforme copié dans le presse-papier ! Tu peux le coller dans WhatsApp.");
+        }).catch(() => {
+          prompt("Copiez ce lien pour le partager :", window.location.href);
+        });
+      }
     }
 
     function mobileNavTo(sectionId) {
@@ -2714,19 +3063,22 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
       if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
-    // Rendu immédiat (0ms) pour Googlebot et affichage instantané
+    // Initialisations au chargement
+    initTheme();
     loadStoredAnnouncements();
     loadStoredComments();
     populateCoordSelects();
     renderAnnouncements();
     renderModules();
-    renderSelectedModuleWorkspace();
+    renderSelectedModuleDocs();
+    renderForumComments(false);
     populateProfSelects();
 
     fetchState();
     syncCloudComments();
+    initLiveChatStream(); // Démarrage du streaming SSE 0s en direct !
     setInterval(fetchState, 10000);
-    setInterval(syncCloudComments, 8000);
+    setInterval(syncCloudComments, 4000); // Polling rapide de secours
   </script>
 
   <!-- BARRE DE NAVIGATION MOBILE (STYLE APPLICATION SMARTPHONE) -->
@@ -2743,7 +3095,7 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
       <span class="mob-nav-icon">🗓️</span>
       <span>Emploi</span>
     </button>
-    <button class="mob-nav-item" onclick="mobileNavTo('moduleWorkspace')">
+    <button class="mob-nav-item" onclick="mobileNavTo('forumSection')">
       <span class="mob-nav-icon">💬</span>
       <span>Forum</span>
     </button>
