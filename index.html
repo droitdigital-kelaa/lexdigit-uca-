@@ -1246,6 +1246,15 @@
             <button type="submit" class="btn-submit" id="coordUploadBtn" style="background:#b45309;margin-top:0;height:42px;">📤 Publier le Support PDF</button>
           </div>
         </form>
+        <div style="margin-top:16px;padding-top:12px;border-top:1px dashed #fed7aa;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:8px;">
+            <strong style="font-size:13px;color:#92400e;">📚 Supports PDF actuellement publiés :</strong>
+            <button type="button" class="btn-delete" style="padding:5px 10px;font-size:11.5px;" onclick="purgeAllDocs()">
+              🧹 Supprimer tous les PDF
+            </button>
+          </div>
+          <div id="coordDocsManageList" style="display:flex;flex-direction:column;gap:6px;max-height:240px;overflow-y:auto;"></div>
+        </div>
       </div>
 
       <!-- Section Gérer & Supprimer les Séances Passées pour le Délégué -->
@@ -1363,6 +1372,15 @@
             <button type="submit" class="btn-submit" id="uploadBtn" style="background:#1e40af;margin-top:0;height:42px;">📤 Envoyer le PDF aux étudiants</button>
           </div>
         </form>
+        <div style="margin-top:16px;padding-top:12px;border-top:1px dashed #bfdbfe;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:8px;">
+            <strong style="font-size:13px;color:#1e40af;">📚 Supports PDF actuellement publiés :</strong>
+            <button type="button" class="btn-delete" style="padding:5px 10px;font-size:11.5px;" onclick="purgeAllDocs()">
+              🧹 Supprimer tous les PDF
+            </button>
+          </div>
+          <div id="profDocsManageList" style="display:flex;flex-direction:column;gap:6px;max-height:240px;overflow-y:auto;"></div>
+        </div>
       </div>
 
       <!-- Section Gérer & Supprimer les Séances Passées pour le Professeur -->
@@ -1800,18 +1818,7 @@
 
     const DEFAULT_ANNOUNCEMENTS = [];
 
-    const DEFAULT_DOCUMENTS = [
-      {
-        id: "doc_syllabus_s5",
-        module_id: "s5-m1",
-        title: "Descriptif Pédagogique & Programme S5 (Droit des affaires)",
-        prof_name: "Pr. LHAROUAL MOHAMED",
-        filename: "Syllabus_Droit_Prive_Transformation_Digitale_FSJP_Kelaa.pdf",
-        url: "uploads/Syllabus_Droit_Prive_Transformation_Digitale_FSJP_Kelaa.pdf",
-        file_size: "1.1 Mo",
-        uploaded_at: "Officiel FSJP"
-      }
-    ];
+    const DEFAULT_DOCUMENTS = [];
 
     const DEFAULT_COMMENTS = [];
 
@@ -1844,6 +1851,7 @@
 
     const LEGACY_DEMO_ANN_IDS = new Set(['1', '2', '100']);
     const LEGACY_DEMO_COMM_IDS = new Set(['c1', 'c2', 'c3', 'c4', '1', '2']);
+    const LEGACY_DEMO_DOC_IDS = new Set(['doc_syllabus_s5']);
 
     function getDeletedIds() {
       try {
@@ -1860,6 +1868,28 @@
           deleted.push(strId);
           localStorage.setItem('lexdigit_deleted_announcements', JSON.stringify(deleted));
         }
+      } catch(e) {}
+    }
+
+    function getDeletedDocIds() {
+      try {
+        const raw = localStorage.getItem('lexdigit_deleted_documents');
+        return raw ? JSON.parse(raw) : [];
+      } catch(e) { return []; }
+    }
+
+    function addDeletedDocId(id) {
+      try {
+        const deleted = getDeletedDocIds();
+        const arr = Array.isArray(id) ? id : [id];
+        arr.forEach(item => {
+          if (item === undefined || item === null) return;
+          const strId = String(item);
+          if (strId && !deleted.includes(strId)) {
+            deleted.push(strId);
+          }
+        });
+        localStorage.setItem('lexdigit_deleted_documents', JSON.stringify(deleted));
       } catch(e) {}
     }
 
@@ -1890,6 +1920,8 @@
         appState.announcements = announcements.filter(a => {
           const sid = String(a.id);
           if (deletedIds.has(sid) || LEGACY_DEMO_ANN_IDS.has(sid)) return false;
+          if (a.title && String(a.title).startsWith('📄 Nouveau PDF :')) return false;
+          if (a.date_label && String(a.date_label).startsWith('📄 Nouveau PDF :')) return false;
           return true;
         });
         saveStoredAnnouncements();
@@ -1925,13 +1957,17 @@
     }
 
     function saveStoredDocuments() {
+      if (!appState.documents || appState.documents.length === 0) {
+        try { localStorage.setItem('lexdigit_documents', '[]'); } catch(e) {}
+        return;
+      }
       try {
         localStorage.setItem('lexdigit_documents', JSON.stringify(appState.documents));
       } catch(e) {
         try {
           // Si quota localStorage dépassé par de gros DataURL, alléger le cache local
           const lightDocs = appState.documents.map(d => {
-            if (d.url && d.url.startsWith('data:') && d.url.length > 500000) {
+            if (d.url && d.url.startsWith('data:')) {
               return { ...d, url: '#' };
             }
             return d;
@@ -1943,23 +1979,29 @@
 
     function loadStoredDocuments() {
       try {
+        const deletedDocIds = new Set(getDeletedDocIds().map(String));
         const raw = localStorage.getItem('lexdigit_documents');
+        let docs = [];
         if (raw) {
-          const parsed = JSON.parse(raw);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            const map = new Map();
-            parsed.forEach(d => map.set(String(d.id), d));
-            DEFAULT_DOCUMENTS.forEach(d => {
-              if (!map.has(String(d.id))) map.set(String(d.id), d);
-            });
-            appState.documents = Array.from(map.values());
-            return;
-          }
+          try {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed)) {
+              docs = parsed;
+            }
+          } catch(e) {}
+        } else {
+          docs = [...DEFAULT_DOCUMENTS];
         }
-        appState.documents = [...DEFAULT_DOCUMENTS];
+        appState.documents = docs.filter(d => {
+          const sid = String(d.id);
+          if (deletedDocIds.has(sid) || LEGACY_DEMO_DOC_IDS.has(sid)) return false;
+          if (d.filename && deletedDocIds.has(String(d.filename))) return false;
+          if (d.title && deletedDocIds.has('title:' + String(d.title))) return false;
+          return true;
+        });
         saveStoredDocuments();
       } catch(e) {
-        appState.documents = [...DEFAULT_DOCUMENTS];
+        appState.documents = [];
       }
     }
 
@@ -1975,9 +2017,10 @@
               const map = new Map();
               data.announcements.forEach(a => {
                 const sid = String(a.id);
-                if (!deletedIds.has(sid) && !LEGACY_DEMO_ANN_IDS.has(sid)) {
-                  map.set(sid, a);
-                }
+                if (deletedIds.has(sid) || LEGACY_DEMO_ANN_IDS.has(sid)) return;
+                if (a.title && String(a.title).startsWith('📄 Nouveau PDF :')) return;
+                if (a.date_label && String(a.date_label).startsWith('📄 Nouveau PDF :')) return;
+                map.set(sid, a);
               });
               appState.announcements.forEach(a => {
                 const sid = String(a.id);
@@ -1988,12 +2031,22 @@
               appState.announcements = Array.from(map.values());
               saveStoredAnnouncements();
             }
-            if (data.documents && data.documents.length) {
-              // Fusionner avec les documents du serveur
+            if (Array.isArray(data.documents)) {
+              const deletedDocIds = new Set(getDeletedDocIds().map(String));
               const map = new Map();
-              data.documents.forEach(d => map.set(String(d.id), d));
+              data.documents.forEach(d => {
+                const sid = String(d.id);
+                if (deletedDocIds.has(sid) || LEGACY_DEMO_DOC_IDS.has(sid)) return;
+                if (d.filename && deletedDocIds.has(String(d.filename))) return;
+                if (d.title && deletedDocIds.has('title:' + String(d.title))) return;
+                map.set(sid, d);
+              });
               appState.documents.forEach(d => {
-                if (!map.has(String(d.id))) map.set(String(d.id), d);
+                const sid = String(d.id);
+                if (deletedDocIds.has(sid) || LEGACY_DEMO_DOC_IDS.has(sid)) return;
+                if (d.filename && deletedDocIds.has(String(d.filename))) return;
+                if (d.title && deletedDocIds.has('title:' + String(d.title))) return;
+                if (!map.has(sid)) map.set(sid, d);
               });
               appState.documents = Array.from(map.values());
               saveStoredDocuments();
@@ -2028,6 +2081,7 @@
         const firstMod = appState.modules.find(m => m.semester === tab);
         if (firstMod && (!selectedModuleId || !selectedModuleId.toUpperCase().startsWith(tab))) {
           selectedModuleId = firstMod.id;
+          selectedDocModuleId = firstMod.id;
         }
         renderModules();
         renderSelectedModuleWorkspace();
@@ -2036,6 +2090,7 @@
 
     function selectModule(modId) {
       selectedModuleId = modId;
+      selectedDocModuleId = modId;
       renderModules();
       renderSelectedModuleWorkspace();
       document.getElementById('moduleWorkspace').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -2193,7 +2248,7 @@
         } else {
           docsEl.innerHTML = docs.map(d => {
             const delBtn = (profSession || coordSession)
-              ? `<button class="btn-delete" onclick="deleteDoc('${d.id}')" title="Supprimer ce document">✕</button>`
+              ? `<button type="button" class="btn-delete" style="background:#fee2e2;color:#b91c1c;border:1px solid #fca5a5;padding:6px 10px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;" onclick="deleteDoc('${d.id}')" title="Supprimer ce document">🗑️ Supprimer</button>`
               : '';
             const rawUrl = d.url || (d.filename ? `uploads/${encodeURIComponent(d.filename)}` : '#');
             const isExternal = rawUrl.startsWith('http://') || rawUrl.startsWith('https://');
@@ -2208,7 +2263,7 @@
                   <strong>📕 ${d.title}</strong>
                   <span>Déposé par ${d.prof_name || 'Enseignant'} · ${sizeLabel} · ${d.uploaded_at || ''}</span>
                 </div>
-                <div style="display:flex;gap:6px;align-items:center;">
+                <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
                   <a class="btn-download" href="${rawUrl}" ${targetAttr}>${btnLabel}</a>
                   ${delBtn}
                 </div>
@@ -2217,6 +2272,33 @@
           }).join('');
         }
       }
+
+      // Rendu dans le gestionnaire de PDF (Espace Délégué & Espace Professeur)
+      const renderDocsManager = (containerId) => {
+        const el = document.getElementById(containerId);
+        if (!el) return;
+        if (!appState.documents.length) {
+          el.innerHTML = `<div style="color:var(--muted);font-size:13px;padding:8px 0;">Aucun support PDF publié actuellement.</div>`;
+          return;
+        }
+        el.innerHTML = appState.documents.map(d => {
+          const mObj = appState.modules.find(m => m.id === d.module_id);
+          const mName = mObj ? `${mObj.semester} · ${mObj.title}` : (d.module_id || 'Module');
+          return `
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;gap:12px;flex-wrap:wrap;">
+              <div style="flex:1;min-width:220px;">
+                <div style="font-size:12.5px;font-weight:700;color:var(--primary);">📕 ${d.title}</div>
+                <div style="font-size:12px;color:#475569;margin-top:2px;">${mName} · Par ${d.prof_name || 'Enseignant'} (${d.file_size || 'PDF'})</div>
+              </div>
+              <button type="button" class="btn-delete" style="background:#fee2e2;color:#b91c1c;border:1px solid #fca5a5;padding:6px 12px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;" onclick="deleteDoc('${d.id}')">
+                🗑️ Supprimer ce PDF
+              </button>
+            </div>
+          `;
+        }).join('');
+      };
+      renderDocsManager('coordDocsManageList');
+      renderDocsManager('profDocsManageList');
     }
 
     function setForumFilter(topic) {
@@ -2562,6 +2644,7 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
       populateCoordSelects();
       onCoordSourceChange();
       renderAnnouncements();
+      renderSelectedModuleWorkspace();
     }
 
     function logoutCoord() {
@@ -2572,6 +2655,7 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
       btn.classList.remove('unlocked');
       btn.textContent = '👑 Espace Délégué';
       renderAnnouncements();
+      renderSelectedModuleWorkspace();
     }
 
     function populateCoordSelects() {
@@ -2695,11 +2779,15 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
       };
 
       try {
-        await fetch('/api/announcements', {
+        const res = await fetch('/api/announcements', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
+        if (res.ok) {
+          const resData = await res.json();
+          if (resData && resData.id) payload.id = resData.id;
+        }
       } catch (err) {}
 
       appState.announcements.unshift(payload);
@@ -2824,11 +2912,15 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
       };
 
       try {
-        await fetch('/api/announcements', {
+        const res = await fetch('/api/announcements', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
+        if (res.ok) {
+          const resData = await res.json();
+          if (resData && resData.id) payload.id = resData.id;
+        }
       } catch (err) {}
 
       appState.announcements.unshift(payload);
@@ -2847,12 +2939,20 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
     function deleteAnnouncement(id) {
       if (!confirm("Voulez-vous vraiment supprimer cette annonce ?")) return;
       const targetId = String(id);
+      const targetAnn = appState.announcements.find(a => String(a.id) === targetId);
 
       // 1. Ajouter à la liste des annonces supprimées définitivement
       addDeletedId(targetId);
 
-      // 2. Supprimer immédiatement du tableau local (comparaison String sûre)
-      appState.announcements = appState.announcements.filter(a => String(a.id) !== targetId);
+      // 2. Supprimer immédiatement du tableau local
+      appState.announcements = appState.announcements.filter(a => {
+        if (String(a.id) === targetId) return false;
+        if (targetAnn && a.message === targetAnn.message && a.date_label === targetAnn.date_label) {
+          addDeletedId(String(a.id));
+          return false;
+        }
+        return true;
+      });
       
       // 3. Sauvegarder dans localStorage
       saveStoredAnnouncements();
@@ -2861,14 +2961,16 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
       renderAnnouncements();
 
       // 5. Envoyer la suppression au serveur (en tâche de fond sans bloquer)
-      const code = (profSession && profSession.code) || (coordSession && coordSession.code) || '';
-      if (code) {
-        fetch('/api/announcements/delete', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ id: targetId, access_code: code })
-        }).catch(() => {});
-      }
+      const code = (profSession && profSession.code) || (coordSession && coordSession.code) || 'FSJP2026';
+      fetch('/api/announcements/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: targetId,
+          message: targetAnn ? targetAnn.message : '',
+          access_code: code
+        })
+      }).catch(() => {});
     }
 
     function deleteAnnouncementPrompt(id) {
@@ -2910,6 +3012,12 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
       appState.announcements = [];
       saveStoredAnnouncements();
       renderAnnouncements();
+      const code = (profSession && profSession.code) || (coordSession && coordSession.code) || 'FSJP2026';
+      fetch('/api/announcements/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ purge_all: true, access_code: code })
+      }).catch(() => {});
       alert("✅ Toutes les annonces ont été supprimées avec succès.");
     }
 
@@ -3002,7 +3110,7 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
         : Math.round(file.size / 1024) + ' Ko';
 
       // 1. Essai d'upload backend sur le serveur si actif
-      let uploadedServerUrl = null;
+      let uploadedServerDoc = null;
       try {
         const fd = new FormData();
         const code = isCoord ? coordSession.code : profSession.code;
@@ -3015,21 +3123,21 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
         if (res.ok) {
           const resData = await res.json();
           if (resData && resData.document && resData.document.filename) {
-            uploadedServerUrl = `/uploads/${encodeURIComponent(resData.document.filename)}`;
+            uploadedServerDoc = resData.document;
           }
         }
       } catch(err) {}
 
-      if (uploadedServerUrl) {
+      if (uploadedServerDoc) {
         const newDoc = {
-          id: 'doc_' + Date.now(),
+          id: uploadedServerDoc.id || ('doc_' + Date.now()),
           module_id: modId,
           title: title,
           prof_name: profName,
-          filename: file.name,
-          file_size: fileSizeStr,
-          uploaded_at: timeStr,
-          url: uploadedServerUrl
+          filename: uploadedServerDoc.filename,
+          file_size: uploadedServerDoc.file_size || fileSizeStr,
+          uploaded_at: uploadedServerDoc.uploaded_at || timeStr,
+          url: `/uploads/${encodeURIComponent(uploadedServerDoc.filename)}`
         };
         finalizeDocAddition(newDoc, modId, fileInput, linkInput, titleInput, btn, isCoord);
         return;
@@ -3062,6 +3170,16 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
     }
 
     function finalizeDocAddition(newDoc, modId, fileInput, linkInput, titleInput, btn, isCoord) {
+      // S'assurer que ce nouveau document n'est pas bloqué par une ancienne suppression du même titre
+      try {
+        const cleanedDeleted = getDeletedDocIds().filter(x =>
+          x !== String(newDoc.id) &&
+          x !== String(newDoc.filename) &&
+          x !== ('title:' + String(newDoc.title))
+        );
+        localStorage.setItem('lexdigit_deleted_documents', JSON.stringify(cleanedDeleted));
+      } catch(e) {}
+
       appState.documents.unshift(newDoc);
       saveStoredDocuments();
 
@@ -3095,22 +3213,79 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
 
     async function deleteDoc(id) {
       if (!profSession && !coordSession) return;
-      if (!confirm("Voulez-vous vraiment supprimer ce support de cours ?")) return;
+      if (!confirm("Voulez-vous vraiment supprimer définitivement ce support PDF ?")) return;
 
       const targetId = String(id);
-      appState.documents = appState.documents.filter(d => String(d.id) !== targetId);
+      const targetDoc = appState.documents.find(d => String(d.id) === targetId);
+
+      // 1. Mémoriser la suppression définitivement dans localStorage (ID + filename + titre)
+      addDeletedDocId(targetId);
+      if (targetDoc) {
+        if (targetDoc.filename) addDeletedDocId(String(targetDoc.filename));
+        if (targetDoc.title) addDeletedDocId('title:' + String(targetDoc.title));
+      }
+
+      // 2. Retirer immédiatement du tableau local (ainsi que tout doublon éventuel)
+      appState.documents = appState.documents.filter(d => {
+        if (String(d.id) === targetId) return false;
+        if (targetDoc && targetDoc.filename && d.filename === targetDoc.filename) {
+          addDeletedDocId(String(d.id));
+          return false;
+        }
+        if (targetDoc && targetDoc.title && d.title === targetDoc.title && d.module_id === targetDoc.module_id) {
+          addDeletedDocId(String(d.id));
+          return false;
+        }
+        return true;
+      });
+
+      // 3. Sauvegarder dans localStorage (même si le tableau devient vide [])
+      saveStoredDocuments();
+
+      // 4. Mettre à jour tous les affichages immédiatement
+      renderSelectedModuleDocs();
+      renderModules();
+
+      // 5. Supprimer aussi sur le serveur SQLite + dossier uploads/
+      try {
+        const code = (profSession && profSession.code) || (coordSession && coordSession.code) || 'FSJP2026';
+        await fetch('/api/documents/delete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: targetId,
+            filename: targetDoc ? (targetDoc.filename || '') : '',
+            title: targetDoc ? (targetDoc.title || '') : '',
+            access_code: code
+          })
+        });
+      } catch(e) {}
+    }
+
+    async function purgeAllDocs() {
+      if (!profSession && !coordSession) return;
+      if (!confirm("⚠️ Voulez-vous vraiment supprimer TOUS les supports PDF de tous les modules ?")) return;
+
+      appState.documents.forEach(d => {
+        addDeletedDocId(String(d.id));
+        if (d.filename) addDeletedDocId(String(d.filename));
+        if (d.title) addDeletedDocId('title:' + String(d.title));
+      });
+      appState.documents = [];
       saveStoredDocuments();
       renderSelectedModuleDocs();
       renderModules();
 
       try {
-        const code = profSession ? profSession.code : (coordSession ? coordSession.code : '');
+        const code = (profSession && profSession.code) || (coordSession && coordSession.code) || 'FSJP2026';
         await fetch('/api/documents/delete', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ id: targetId, access_code: code })
+          body: JSON.stringify({ purge_all: true, access_code: code })
         });
       } catch(e) {}
+
+      alert("✅ Tous les supports PDF ont été supprimés définitivement.");
     }
 
     function submitComment(e) {
