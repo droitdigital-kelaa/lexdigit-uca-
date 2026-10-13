@@ -174,10 +174,10 @@
 
     /* HEADER */
     header {
-      background: linear-gradient(135deg, #ea580c 0%, #d97706 100%);
+      background: var(--primary);
       color: white;
       padding: 18px 24px;
-      box-shadow: 0 3px 12px rgba(234, 88, 12, 0.25);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
       position: sticky;
       top: 0;
       z-index: 50;
@@ -220,7 +220,7 @@
     }
     .brand-sub {
       font-size: 13px;
-      color: #fff7ed;
+      color: #cbd5e1;
     }
     .header-actions {
       display: flex;
@@ -229,9 +229,9 @@
       flex-wrap: wrap;
     }
     .prof-btn {
-      background: rgba(15, 23, 42, 0.22);
+      background: rgba(255,255,255,0.14);
       color: white;
-      border: 1px solid rgba(255, 255, 255, 0.45);
+      border: 1px solid rgba(255,255,255,0.3);
       padding: 9px 16px;
       border-radius: 8px;
       font-weight: 700;
@@ -240,30 +240,30 @@
       transition: 0.2s;
     }
     .prof-btn:hover {
-      background: rgba(15, 23, 42, 0.35);
+      background: rgba(255,255,255,0.25);
     }
     .prof-btn.unlocked {
-      background: #10b981;
-      color: #ffffff;
-      border-color: #34d399;
+      background: #f59e0b;
+      color: #111827;
+      border-color: #f59e0b;
     }
     .coord-btn {
-      background: #ffffff;
-      color: #c2410c;
-      border: 1.5px solid #ffedd5;
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      color: #ffffff;
+      border: 1px solid #fbbf24;
       padding: 9px 16px;
       border-radius: 8px;
       font-weight: 800;
       font-size: 13.5px;
       cursor: pointer;
       transition: 0.2s;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.16);
+      box-shadow: 0 2px 8px rgba(217, 119, 6, 0.35);
       display: inline-flex;
       align-items: center;
       gap: 6px;
     }
     .coord-btn:hover {
-      background: #fff7ed;
+      background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
       transform: translateY(-1px);
     }
     .coord-btn.unlocked {
@@ -1121,7 +1121,7 @@
         </div>
         <div>
           <h1 class="brand-title" style="margin:0;font-size:19px;font-weight:800;">⚖️ Licence : Droit Privé et Transformation Digitale</h1>
-          <p class="brand-sub" style="margin:2px 0 0 0;font-size:13px;color:#fff7ed;">Faculté des Sciences Juridiques et Politiques (FSJP) — El Kelaâ des Sraghna · Université Cadi Ayyad</p>
+          <p class="brand-sub" style="margin:2px 0 0 0;font-size:13px;color:#cbd5e1;">Faculté des Sciences Juridiques et Politiques (FSJP) — El Kelaâ des Sraghna · Université Cadi Ayyad</p>
         </div>
       </div>
       <div class="header-actions">
@@ -1798,21 +1798,7 @@
       { id: "s6-m7", semester: "S6", code: "S6-M7", title: "Modes alternatifs de règlement de différends (MARD)", professor: "Équipe Pédagogique FSJP", room: "S6", schedule: "Semestre 6" }
     ];
 
-    const DEFAULT_ANNOUNCEMENTS = [
-      {
-        id: 100,
-        module_id: "ALL",
-        prof_name: "Délégué de Promotion",
-        is_coord: true,
-        prof_source: "Coordination de la Promotion",
-        status_type: "info",
-        date_label: "Avis Officiel · Année 2026-2027",
-        message: "Bienvenue à tous les étudiants de notre promotion ! Cet espace est dédié aux annonces officielles de la Licence transmises par les professeurs (cours maintenus, absences, rattrapages et salles).",
-        created_at: "Délégué de Promotion"
-      },
-      { id: 1, module_id: "s5-m1", prof_name: "Pr. LHAROUAL MOHAMED", status_type: "present", date_label: "🟢 Lundi 12/10/2026 à 13h00 (Salle 8)", message: "Bienvenue aux étudiants de la Licence d'Excellence Droit Privé et Transformation Digitale. La première séance de Droit des affaires aura lieu le Lundi à 13h00 en Salle 8.", created_at: "Officiel FSJP" },
-      { id: 2, module_id: "s5-m3", prof_name: "Pr. BEYYOUDH MED SAMI", status_type: "present", date_label: "🟢 Jeudi 17h30 (Salle 2BIS)", message: "La séance de Droit des contrats numériques est programmée chaque Jeudi de 17h30 à 19h00 en Salle 2BIS.", created_at: "Officiel FSJP" }
-    ];
+    const DEFAULT_ANNOUNCEMENTS = [];
 
     const DEFAULT_DOCUMENTS = [
       {
@@ -1827,12 +1813,7 @@
       }
     ];
 
-    const DEFAULT_COMMENTS = [
-      { id: "c1", module_id: "s5-m1", author: "Délégué de Promotion", role: "coord", message: "Salam les amis ! Bienvenue sur la plateforme officielle de notre promotion. Posez vos questions et partagez vos remarques ici.", created_at: "10/10/2026 à 14h00" },
-      { id: "c2", module_id: "s5-m1", author: "Pr. LHAROUAL MOHAMED", role: "prof", message: "Bienvenue à toutes et à tous. Les supports de cours PDF seront publiés directement dans chaque module.", created_at: "10/10/2026 à 16h30" },
-      { id: "c3", module_id: "GEN", author: "Délégué de Promotion", role: "coord", message: "📢 Salon Général ouvert à toute la promotion ! N'hésitez pas à poser vos questions sur l'emploi du temps ou les cours.", created_at: "11/10/2026 à 10h00" },
-      { id: "c4", module_id: "GEN", author: "Étudiant FSJP", role: "student", message: "Tbarkellah 3lik a monasi9, had l-plateforme nfa3atna bzaf bach ntb3o les cours !", created_at: "11/10/2026 à 11h15" }
-    ];
+    const DEFAULT_COMMENTS = [];
 
     const TOPIC_LABELS = {
       'ALL': '💬 Général',
@@ -1860,6 +1841,9 @@
     const NTFY_TOPIC = 'lexdigit_uca_sraghna_forum_2026';
     let profSession = null;
     let coordSession = null;
+
+    const LEGACY_DEMO_ANN_IDS = new Set(['1', '2', '100']);
+    const LEGACY_DEMO_COMM_IDS = new Set(['c1', 'c2', 'c3', 'c4', '1', '2']);
 
     function getDeletedIds() {
       try {
@@ -1898,15 +1882,16 @@
               announcements = parsed;
             }
           } catch(e){}
-        }
-
-        // Si le stockage n'est pas encore initialisé, utiliser DEFAULT_ANNOUNCEMENTS
-        if (!raw) {
+        } else {
           announcements = [...DEFAULT_ANNOUNCEMENTS];
         }
 
-        // Filtrer toutes les annonces supprimées de façon définitive
-        appState.announcements = announcements.filter(a => !deletedIds.has(String(a.id)));
+        // Filtrer les annonces supprimées ainsi que les anciennes annonces par défaut
+        appState.announcements = announcements.filter(a => {
+          const sid = String(a.id);
+          if (deletedIds.has(sid) || LEGACY_DEMO_ANN_IDS.has(sid)) return false;
+          return true;
+        });
         saveStoredAnnouncements();
       } catch(e) {}
     }
@@ -1919,16 +1904,16 @@
 
     function loadStoredComments() {
       try {
+        const deletedIds = getDeletedCommentIds();
         const raw = localStorage.getItem('lexdigit_comments');
         if (raw) {
           const parsed = JSON.parse(raw);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            const map = new Map();
-            parsed.forEach(c => map.set(String(c.id), c));
-            DEFAULT_COMMENTS.forEach(c => {
-              if (!map.has(String(c.id))) map.set(String(c.id), c);
+          if (Array.isArray(parsed)) {
+            appState.comments = parsed.filter(c => {
+              const sid = String(c.id);
+              return !deletedIds.has(sid) && !LEGACY_DEMO_COMM_IDS.has(sid);
             });
-            appState.comments = Array.from(map.values());
+            saveStoredComments();
             return;
           }
         }
@@ -1985,8 +1970,22 @@
           const data = await res.json();
           if (data && data.modules && data.modules.length) {
             appState.modules = data.modules;
-            if (data.announcements && data.announcements.length) {
-              appState.announcements = data.announcements;
+            if (Array.isArray(data.announcements)) {
+              const deletedIds = new Set(getDeletedIds().map(String));
+              const map = new Map();
+              data.announcements.forEach(a => {
+                const sid = String(a.id);
+                if (!deletedIds.has(sid) && !LEGACY_DEMO_ANN_IDS.has(sid)) {
+                  map.set(sid, a);
+                }
+              });
+              appState.announcements.forEach(a => {
+                const sid = String(a.id);
+                if (!deletedIds.has(sid) && !LEGACY_DEMO_ANN_IDS.has(sid) && !map.has(sid)) {
+                  map.set(sid, a);
+                }
+              });
+              appState.announcements = Array.from(map.values());
               saveStoredAnnouncements();
             }
             if (data.documents && data.documents.length) {
