@@ -1846,6 +1846,7 @@
     let selectedDocModuleId = 's5-m1';
     let forumFilter = 'ALL';
     const NTFY_TOPIC = 'lexdigit_uca_sraghna_forum_2026';
+    const CLOUD_SYNC_BIN_URL = 'https://extendsclass.com/api/json-storage/bin/baeadeb';
     let profSession = null;
     let coordSession = null;
 
@@ -2061,6 +2062,104 @@
       } catch (err) {
         // En mode statique ou si le serveur se réveille, l'affichage initial reste 100% visible
       }
+    }
+
+    async function syncCloudData() {
+      try {
+        const res = await fetch(CLOUD_SYNC_BIN_URL, { cache: 'no-store' });
+        if (!res.ok) return;
+        const cloud = await res.json();
+        if (!cloud) return;
+
+        // 1. Synchronisation des Annonces Cloud
+        if (Array.isArray(cloud.announcements)) {
+          const deletedIds = new Set(getDeletedIds().map(String));
+          const map = new Map();
+          cloud.announcements.forEach(a => {
+            const sid = String(a.id);
+            if (deletedIds.has(sid) || LEGACY_DEMO_ANN_IDS.has(sid)) return;
+            map.set(sid, a);
+          });
+
+          // Si le professeur ou délégué a déjà une annonce locale (postée sur son appareil)
+          let hasLocalToPush = false;
+          appState.announcements.forEach(a => {
+            const sid = String(a.id);
+            if (!deletedIds.has(sid) && !LEGACY_DEMO_ANN_IDS.has(sid) && !map.has(sid)) {
+              map.set(sid, a);
+              hasLocalToPush = true; // On l'envoie automatiquement au cloud pour les autres !
+            }
+          });
+
+          const mergedAnn = Array.from(map.values()).sort((a,b) => (Number(b.id)||0) - (Number(a.id)||0));
+          if (JSON.stringify(mergedAnn) !== JSON.stringify(appState.announcements)) {
+            appState.announcements = mergedAnn;
+            saveStoredAnnouncements();
+            renderAnnouncements();
+          }
+
+          if (hasLocalToPush) {
+            pushStateToCloud();
+          }
+        }
+
+        // 2. Synchronisation des Documents PDF Cloud
+        if (Array.isArray(cloud.documents)) {
+          const deletedDocIds = new Set(getDeletedDocIds().map(String));
+          const map = new Map();
+          cloud.documents.forEach(d => {
+            const sid = String(d.id);
+            if (deletedDocIds.has(sid) || LEGACY_DEMO_DOC_IDS.has(sid)) return;
+            if (d.filename && deletedDocIds.has(String(d.filename))) return;
+            if (d.title && deletedDocIds.has('title:' + String(d.title))) return;
+            map.set(sid, d);
+          });
+
+          let hasDocLocalToPush = false;
+          appState.documents.forEach(d => {
+            const sid = String(d.id);
+            if (deletedDocIds.has(sid) || LEGACY_DEMO_DOC_IDS.has(sid)) return;
+            if (d.filename && deletedDocIds.has(String(d.filename))) return;
+            if (d.title && deletedDocIds.has('title:' + String(d.title))) return;
+            if (!map.has(sid)) {
+              map.set(sid, d);
+              hasDocLocalToPush = true;
+            }
+          });
+
+          const mergedDocs = Array.from(map.values());
+          if (JSON.stringify(mergedDocs) !== JSON.stringify(appState.documents)) {
+            appState.documents = mergedDocs;
+            saveStoredDocuments();
+            renderSelectedModuleDocs();
+            renderModules();
+          }
+
+          if (hasDocLocalToPush) {
+            pushStateToCloud();
+          }
+        }
+      } catch(err) {}
+    }
+
+    async function pushStateToCloud() {
+      try {
+        const payload = {
+          announcements: appState.announcements,
+          documents: appState.documents,
+          last_updated: new Date().toISOString()
+        };
+        await fetch(CLOUD_SYNC_BIN_URL, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        // Notifier ntfy.sh pour mise à jour instantanée 0s sur les téléphones connectés
+        fetch(`https://ntfy.sh/${NTFY_TOPIC}`, {
+          method: 'POST',
+          body: JSON.stringify({ action: 'cloud_sync' })
+        }).catch(() => {});
+      } catch(err) {}
     }
 
     function switchView(tab) {
@@ -2793,6 +2892,7 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
       appState.announcements.unshift(payload);
       saveStoredAnnouncements();
       renderAnnouncements();
+      pushStateToCloud();
       document.getElementById('coordMessageInput').value = '';
       updateWhatsAppPreview();
       alert("✅ L'annonce a été publiée avec succès sur la plateforme !");
@@ -2926,6 +3026,7 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
       appState.announcements.unshift(payload);
       saveStoredAnnouncements();
       renderAnnouncements();
+      pushStateToCloud();
       const msgInp = document.getElementById('profAnnMessageInput');
       if (msgInp) msgInp.value = '';
       updateProfWhatsAppPreview();
@@ -2959,6 +3060,7 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
 
       // 4. Mettre à jour l'affichage immédiatement
       renderAnnouncements();
+      pushStateToCloud();
 
       // 5. Envoyer la suppression au serveur (en tâche de fond sans bloquer)
       const code = (profSession && profSession.code) || (coordSession && coordSession.code) || 'FSJP2026';
@@ -3012,6 +3114,7 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
       appState.announcements = [];
       saveStoredAnnouncements();
       renderAnnouncements();
+      pushStateToCloud();
       const code = (profSession && profSession.code) || (coordSession && coordSession.code) || 'FSJP2026';
       fetch('/api/announcements/delete', {
         method: 'POST',
@@ -3182,6 +3285,7 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
 
       appState.documents.unshift(newDoc);
       saveStoredDocuments();
+      pushStateToCloud();
 
       // Basculer l'affichage vers le module destinataire
       selectedDocModuleId = modId;
@@ -3241,6 +3345,7 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
 
       // 3. Sauvegarder dans localStorage (même si le tableau devient vide [])
       saveStoredDocuments();
+      pushStateToCloud();
 
       // 4. Mettre à jour tous les affichages immédiatement
       renderSelectedModuleDocs();
@@ -3273,6 +3378,7 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
       });
       appState.documents = [];
       saveStoredDocuments();
+      pushStateToCloud();
       renderSelectedModuleDocs();
       renderModules();
 
@@ -3420,6 +3526,10 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
     function handleIncomingLiveComment(rawMsg, eventId) {
       try {
         const msgObj = typeof rawMsg === 'string' ? JSON.parse(rawMsg) : rawMsg;
+        if (msgObj.action === 'cloud_sync' || msgObj.action === 'new_announcement' || msgObj.action === 'delete_announcement') {
+          syncCloudData();
+          return;
+        }
         if (msgObj.action === 'delete_comment' && msgObj.target_id) {
           addDeletedCommentIds(msgObj.target_id);
           appState.comments = appState.comments.filter(c => String(c.id) !== String(msgObj.target_id));
@@ -3625,9 +3735,11 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
     renderForumComments(false);
     populateProfSelects();
 
+    syncCloudData(); // Synchronisation Cloud 24/7 (Annonces & Supports)
     fetchState();
     syncCloudComments();
     initLiveChatStream(); // Démarrage du streaming SSE 0s en direct !
+    setInterval(syncCloudData, 4000); // Polling automatique Cloud toutes les 4 secondes
     setInterval(fetchState, 10000);
     setInterval(syncCloudComments, 4000); // Polling rapide de secours
   </script>
