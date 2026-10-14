@@ -429,7 +429,7 @@
       gap: 8px;
     }
 
-    /* ANNOUNCEMENTS (WACH GHDA 9ARYIN ?) */
+    /* ANNOUNCEMENTS OFFICIELLES */
     .ann-list {
       display: flex;
       flex-direction: column;
@@ -1247,10 +1247,10 @@
             <label style="font-size:12px;font-weight:700;color:#475569;display:block;margin-bottom:4px;">2. Module / Matière concernée :</label>
             <select id="coordModuleSelect"></select>
 
-            <label style="font-size:12px;font-weight:700;color:#475569;display:block;margin-bottom:4px;">3. Statut de la séance (Wach ghda 9aryin ?) :</label>
+            <label style="font-size:12px;font-weight:700;color:#475569;display:block;margin-bottom:4px;">3. Statut officiel de la séance :</label>
             <select id="coordStatusSelect" onchange="updateWhatsAppPreview()">
-              <option value="present">🟢 Cours maintenu (9aryin f l-wa9t m3a l-prof)</option>
-              <option value="absent">🔴 Cours reporté / absent (Ma-9aryinch)</option>
+              <option value="present">🟢 Cours maintenu (Séance confirmée)</option>
+              <option value="absent">🔴 Séance reportée / Absence de l'enseignant</option>
               <option value="rattrapage">🟠 Séance de rattrapage (Rattrapage programmé)</option>
               <option value="salle">🟣 Changement de salle ou d'horaire</option>
               <option value="info">🔵 Information générale / Avis important</option>
@@ -1283,7 +1283,7 @@
               📋 Copier pour WhatsApp
             </button>
             <div id="copySuccessMsg" style="display:none;color:#16a34a;font-size:12px;font-weight:700;margin-top:6px;text-align:center;">
-              ✅ Message copié ! Tu peux le coller direct f l-groupe WhatsApp.
+              ✅ Message copié avec succès ! Vous pouvez le coller dans votre groupe WhatsApp.
             </div>
           </div>
         </div>
@@ -1375,10 +1375,10 @@
             <label style="font-size:12px;font-weight:700;color:#475569;display:block;margin-bottom:4px;">2. Module / Matière concernée :</label>
             <select id="profAnnModuleSelect" onchange="onProfModuleChange()"></select>
 
-            <label style="font-size:12px;font-weight:700;color:#475569;display:block;margin-bottom:4px;">3. Statut de la séance (Wach ghda 9aryin ?) :</label>
+            <label style="font-size:12px;font-weight:700;color:#475569;display:block;margin-bottom:4px;">3. Statut officiel de la séance :</label>
             <select id="profAnnStatusSelect" onchange="updateProfWhatsAppPreview()">
-              <option value="present">🟢 Cours maintenu (Séance confirmée f l-wa9t)</option>
-              <option value="absent">🔴 Cours reporté / absent (Séance reportée / ma-9aryinch)</option>
+              <option value="present">🟢 Cours maintenu (Séance confirmée)</option>
+              <option value="absent">🔴 Séance reportée / Absence de l'enseignant</option>
               <option value="rattrapage">🟠 Séance de rattrapage (Rattrapage programmé)</option>
               <option value="salle">🟣 Changement de salle ou d'horaire</option>
               <option value="info">🔵 Information générale / Avis important</option>
@@ -1411,7 +1411,7 @@
               📋 Copier pour WhatsApp
             </button>
             <div id="profCopySuccessMsg" style="display:none;color:#16a34a;font-size:12px;font-weight:700;margin-top:6px;text-align:center;">
-              ✅ Message copié ! Tu peux le coller direct f WhatsApp.
+              ✅ Message copié avec succès ! Vous pouvez le coller dans votre groupe WhatsApp.
             </div>
           </div>
         </div>
@@ -1473,10 +1473,10 @@
       </div>
     </div>
 
-    <!-- 1. LIVE ANNOUNCEMENTS ("WACH GHDA 9ARYIN ?") -->
+    <!-- 1. LIVE ANNOUNCEMENTS (AVIS & ANNONCES OFFICIELLES) -->
     <div class="box" id="announcementsSection">
       <div class="box-header">
-        <div class="box-title">📢 Annonces des Professeurs (Wach ghda 9aryin ?)</div>
+        <div class="box-title">📢 Annonces Officielles des Enseignants</div>
         <span style="font-size:12px;color:var(--muted);">Mise à jour en direct</span>
       </div>
       <div id="announcementsList" class="ann-list"></div>
@@ -2291,8 +2291,8 @@
         container.innerHTML = `<div style="color:var(--muted);font-size:13.5px;padding:12px 0;">Aucune annonce pour le moment.</div>`;
       } else {
         const statusLabels = {
-          present: '🟢 Cours maintenu (9aryin)',
-          absent: '🔴 Cours reporté / absent',
+          present: '🟢 Cours maintenu',
+          absent: '🔴 Séance reportée',
           rattrapage: '🟠 Rattrapage',
           salle: '🟣 Changement de salle',
           info: '🔵 Information'
@@ -2896,8 +2896,8 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
       const msgVal = document.getElementById('coordMessageInput').value.trim();
 
       const statusIcons = {
-        present: '🟢 *COURS MAINTENU (9ARYIN F L-WA9T)*',
-        absent: '🔴 *COURS REPORTÉ / ABSENCE DU PROFESSEUR (MA-9ARYINCH)*',
+        present: '🟢 *SÉANCE MAINTENUE (CONFIRMÉE)*',
+        absent: '🔴 *SÉANCE REPORTÉE / ABSENCE DE L\'ENSEIGNANT*',
         rattrapage: '🟠 *SÉANCE DE RATTRAPAGE PROGRAMMÉE*',
         salle: '🟣 *CHANGEMENT DE SALLE OU D\'HORAIRE*',
         info: '🔵 *INFORMATION OFFICIELLE & AVIS IMPORTANT*'
