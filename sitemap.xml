@@ -1,13 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://droitdigital-kelaa.digital/</loc>
+    <lastmod>2026-10-14</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://droitdigital-kelaa.digital/logo_filiere_droit_digital.jpg</image:loc>
+      <image:title>Logo Licence d'Excellence Droit Privé et Transformation Digitale - FSJP El Kelaâ</image:title>
+      <image:caption>Emblème officiel de la filière Droit Digital à la Faculté des Sciences Juridiques et Politiques d'El Kelaâ des Sraghna</image:caption>
+    </image:image>
   </url>
   <url>
     <loc>https://salahboulafaa34-hue.github.io/lexdigit-uca-/</loc>
-    <changefreq>daily</changefreq>
+    <lastmod>2026-10-14</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
 </urlset>
