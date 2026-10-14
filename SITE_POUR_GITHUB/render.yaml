@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: lexdigit-uca-fsjp-kelaa
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python server.py
+    envVars:
+      - key: NO_TUNNEL
+        value: "1"
+      - key: NO_BROWSER
+        value: "1"
