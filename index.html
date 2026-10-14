@@ -2020,6 +2020,7 @@
     let selectedDocModuleId = 's5-m1';
     let forumFilter = 'ALL';
     const NTFY_TOPIC = 'lexdigit_uca_sraghna_forum_2026';
+    const NTFY_ANN_TOPIC = 'lexdigit_uca_sraghna_announcements_2026';
     const CLOUD_SYNC_BIN_URL = 'https://extendsclass.com/api/json-storage/bin/baeadeb';
     let profSession = null;
     let coordSession = null;
@@ -2238,100 +2239,178 @@
       }
     }
 
+    async function broadcastAnnouncement(payload) {
+      try {
+        const msg = JSON.stringify({
+          action: 'publish_announcement',
+          announcement: payload
+        });
+        // 1. Publier sur le topic ntfy dédié aux annonces (persistant & accessible à tous)
+        fetch(`https://ntfy.sh/${NTFY_ANN_TOPIC}`, {
+          method: 'POST',
+          headers: { 'Title': `📢 Annonce : ${payload.prof_source || payload.prof_name}` },
+          body: msg
+        }).catch(() => {});
+
+        // 2. Diffuser sur le flux temps réel 0s (SSE) du forum pour tous les utilisateurs en ligne
+        fetch(`https://ntfy.sh/${NTFY_TOPIC}`, {
+          method: 'POST',
+          body: msg
+        }).catch(() => {});
+      } catch (err) {}
+    }
+
+    function broadcastDeleteAnnouncement(targetId) {
+      const msg = JSON.stringify({
+        action: 'delete_announcement',
+        target_id: String(targetId)
+      });
+      fetch(`https://ntfy.sh/${NTFY_ANN_TOPIC}`, { method: 'POST', body: msg }).catch(() => {});
+      fetch(`https://ntfy.sh/${NTFY_TOPIC}`, { method: 'POST', body: msg }).catch(() => {});
+    }
+
+    async function syncCloudAnnouncements() {
+      try {
+        const res = await fetch(`https://ntfy.sh/${NTFY_ANN_TOPIC}/json?poll=1&since=all`, { cache: 'no-store' });
+        if (!res.ok) return;
+        const text = await res.text();
+        if (!text) return;
+        const lines = text.split('\n').filter(l => l.trim().length > 0);
+        const deletedIds = new Set(getDeletedIds().map(String));
+        let hasNew = false;
+        const map = new Map();
+
+        // 1. Charger les annonces locales existantes
+        appState.announcements.forEach(a => {
+          const sid = String(a.id);
+          if (!deletedIds.has(sid) && !LEGACY_DEMO_ANN_IDS.has(sid)) {
+            map.set(sid, a);
+          }
+        });
+
+        const cloudIds = new Set();
+
+        // 2. Récupérer et fusionner les annonces du Cloud (ntfy)
+        for (const line of lines) {
+          try {
+            const item = JSON.parse(line);
+            if (item.event === 'message' && item.message) {
+              let msgObj = null;
+              try { msgObj = JSON.parse(item.message); } catch(e){}
+              if (!msgObj) continue;
+
+              if (msgObj.action === 'delete_announcement' && msgObj.target_id) {
+                const delId = String(msgObj.target_id);
+                addDeletedId(delId);
+                deletedIds.add(delId);
+                if (map.has(delId)) {
+                  map.delete(delId);
+                  hasNew = true;
+                }
+              } else if (msgObj.action === 'publish_announcement' && msgObj.announcement) {
+                const ann = msgObj.announcement;
+                const sid = String(ann.id);
+                cloudIds.add(sid);
+                if (!deletedIds.has(sid) && !LEGACY_DEMO_ANN_IDS.has(sid) && !map.has(sid)) {
+                  map.set(sid, ann);
+                  hasNew = true;
+                }
+              } else if (msgObj.id && (msgObj.prof_name || msgObj.message)) {
+                const sid = String(msgObj.id);
+                cloudIds.add(sid);
+                if (!deletedIds.has(sid) && !LEGACY_DEMO_ANN_IDS.has(sid) && !map.has(sid)) {
+                  map.set(sid, msgObj);
+                  hasNew = true;
+                }
+              }
+            }
+          } catch(e){}
+        }
+
+        // Si le prof a une annonce locale non encore présente dans le Cloud, on la publie automatiquement une seule fois !
+        const pushedIds = new Set(JSON.parse(localStorage.getItem('lexdigit_pushed_ann_ids') || '[]'));
+        let pushedUpdated = false;
+        appState.announcements.forEach(a => {
+          const sid = String(a.id);
+          if (!deletedIds.has(sid) && !LEGACY_DEMO_ANN_IDS.has(sid) && !cloudIds.has(sid) && !pushedIds.has(sid)) {
+            broadcastAnnouncement(a);
+            pushedIds.add(sid);
+            pushedUpdated = true;
+          }
+        });
+        if (pushedUpdated) {
+          try { localStorage.setItem('lexdigit_pushed_ann_ids', JSON.stringify(Array.from(pushedIds))); } catch(e){}
+        }
+
+        if (hasNew) {
+          appState.announcements = Array.from(map.values()).sort((a,b) => (Number(b.id)||0) - (Number(a.id)||0));
+          saveStoredAnnouncements();
+          renderAnnouncements();
+        }
+      } catch(err){}
+    }
+
     async function syncCloudData() {
+      // 1. Synchronisation instantanée des Annonces
+      await syncCloudAnnouncements();
+
+      // 2. Synchronisation des Documents PDF
       try {
         const res = await fetch(CLOUD_SYNC_BIN_URL, { cache: 'no-store' });
         if (!res.ok) return;
         const cloud = await res.json();
-        if (!cloud) return;
+        if (!cloud || !Array.isArray(cloud.documents)) return;
 
-        // 1. Synchronisation des Annonces Cloud
-        if (Array.isArray(cloud.announcements)) {
-          const deletedIds = new Set(getDeletedIds().map(String));
-          const map = new Map();
-          cloud.announcements.forEach(a => {
-            const sid = String(a.id);
-            if (deletedIds.has(sid) || LEGACY_DEMO_ANN_IDS.has(sid)) return;
-            map.set(sid, a);
-          });
+        const deletedDocIds = new Set(getDeletedDocIds().map(String));
+        const map = new Map();
+        cloud.documents.forEach(d => {
+          const sid = String(d.id);
+          if (deletedDocIds.has(sid) || LEGACY_DEMO_DOC_IDS.has(sid)) return;
+          if (d.filename && deletedDocIds.has(String(d.filename))) return;
+          if (d.title && deletedDocIds.has('title:' + String(d.title))) return;
+          map.set(sid, d);
+        });
 
-          // Si le professeur ou délégué a déjà une annonce locale (postée sur son appareil)
-          let hasLocalToPush = false;
-          appState.announcements.forEach(a => {
-            const sid = String(a.id);
-            if (!deletedIds.has(sid) && !LEGACY_DEMO_ANN_IDS.has(sid) && !map.has(sid)) {
-              map.set(sid, a);
-              hasLocalToPush = true; // On l'envoie automatiquement au cloud pour les autres !
-            }
-          });
-
-          const mergedAnn = Array.from(map.values()).sort((a,b) => (Number(b.id)||0) - (Number(a.id)||0));
-          if (JSON.stringify(mergedAnn) !== JSON.stringify(appState.announcements)) {
-            appState.announcements = mergedAnn;
-            saveStoredAnnouncements();
-            renderAnnouncements();
+        let hasDocLocalToPush = false;
+        appState.documents.forEach(d => {
+          const sid = String(d.id);
+          if (deletedDocIds.has(sid) || LEGACY_DEMO_DOC_IDS.has(sid)) return;
+          if (d.filename && deletedDocIds.has(String(d.filename))) return;
+          if (d.title && deletedDocIds.has('title:' + String(d.title))) return;
+          if (!map.has(sid)) {
+            map.set(sid, d);
+            hasDocLocalToPush = true;
           }
+        });
 
-          if (hasLocalToPush) {
-            pushStateToCloud();
-          }
+        const mergedDocs = Array.from(map.values());
+        if (JSON.stringify(mergedDocs) !== JSON.stringify(appState.documents)) {
+          appState.documents = mergedDocs;
+          saveStoredDocuments();
+          renderSelectedModuleDocs();
+          renderModules();
         }
 
-        // 2. Synchronisation des Documents PDF Cloud
-        if (Array.isArray(cloud.documents)) {
-          const deletedDocIds = new Set(getDeletedDocIds().map(String));
-          const map = new Map();
-          cloud.documents.forEach(d => {
-            const sid = String(d.id);
-            if (deletedDocIds.has(sid) || LEGACY_DEMO_DOC_IDS.has(sid)) return;
-            if (d.filename && deletedDocIds.has(String(d.filename))) return;
-            if (d.title && deletedDocIds.has('title:' + String(d.title))) return;
-            map.set(sid, d);
-          });
-
-          let hasDocLocalToPush = false;
-          appState.documents.forEach(d => {
-            const sid = String(d.id);
-            if (deletedDocIds.has(sid) || LEGACY_DEMO_DOC_IDS.has(sid)) return;
-            if (d.filename && deletedDocIds.has(String(d.filename))) return;
-            if (d.title && deletedDocIds.has('title:' + String(d.title))) return;
-            if (!map.has(sid)) {
-              map.set(sid, d);
-              hasDocLocalToPush = true;
-            }
-          });
-
-          const mergedDocs = Array.from(map.values());
-          if (JSON.stringify(mergedDocs) !== JSON.stringify(appState.documents)) {
-            appState.documents = mergedDocs;
-            saveStoredDocuments();
-            renderSelectedModuleDocs();
-            renderModules();
-          }
-
-          if (hasDocLocalToPush) {
-            pushStateToCloud();
-          }
+        if (hasDocLocalToPush) {
+          pushStateToCloud();
         }
       } catch(err) {}
     }
 
     async function pushStateToCloud() {
       try {
+        // Diffuser toutes les annonces locales
+        appState.announcements.forEach(a => broadcastAnnouncement(a));
+
         const payload = {
           announcements: appState.announcements,
           documents: appState.documents,
           last_updated: new Date().toISOString()
         };
-        await fetch(CLOUD_SYNC_BIN_URL, {
+        fetch(CLOUD_SYNC_BIN_URL, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
-        });
-        // Notifier ntfy.sh pour mise à jour instantanée 0s sur les téléphones connectés
-        fetch(`https://ntfy.sh/${NTFY_TOPIC}`, {
-          method: 'POST',
-          body: JSON.stringify({ action: 'cloud_sync' })
         }).catch(() => {});
       } catch(err) {}
     }
@@ -3066,6 +3145,7 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
       appState.announcements.unshift(payload);
       saveStoredAnnouncements();
       renderAnnouncements();
+      broadcastAnnouncement(payload);
       pushStateToCloud();
       document.getElementById('coordMessageInput').value = '';
       updateWhatsAppPreview();
@@ -3200,6 +3280,7 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
       appState.announcements.unshift(payload);
       saveStoredAnnouncements();
       renderAnnouncements();
+      broadcastAnnouncement(payload);
       pushStateToCloud();
       const msgInp = document.getElementById('profAnnMessageInput');
       if (msgInp) msgInp.value = '';
@@ -3234,6 +3315,7 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
 
       // 4. Mettre à jour l'affichage immédiatement
       renderAnnouncements();
+      broadcastDeleteAnnouncement(targetId);
       pushStateToCloud();
 
       // 5. Envoyer la suppression au serveur (en tâche de fond sans bloquer)
@@ -3681,7 +3763,7 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
         try { liveEventSource.close(); } catch(e){}
       }
       try {
-        liveEventSource = new EventSource(`https://ntfy.sh/${NTFY_TOPIC}/sse`);
+        liveEventSource = new EventSource(`https://ntfy.sh/${NTFY_TOPIC},${NTFY_ANN_TOPIC}/sse`);
         liveEventSource.onmessage = function(event) {
           try {
             const item = JSON.parse(event.data);
@@ -3700,7 +3782,35 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
     function handleIncomingLiveComment(rawMsg, eventId) {
       try {
         const msgObj = typeof rawMsg === 'string' ? JSON.parse(rawMsg) : rawMsg;
-        if (msgObj.action === 'cloud_sync' || msgObj.action === 'new_announcement' || msgObj.action === 'delete_announcement') {
+        if (!msgObj) return;
+
+        // Événements d'Annonces en Direct (0s)
+        if (msgObj.action === 'publish_announcement' && msgObj.announcement) {
+          const ann = msgObj.announcement;
+          const sid = String(ann.id);
+          const deletedIds = new Set(getDeletedIds().map(String));
+          if (!deletedIds.has(sid) && !LEGACY_DEMO_ANN_IDS.has(sid)) {
+            const exists = appState.announcements.some(a => String(a.id) === sid);
+            if (!exists) {
+              appState.announcements.unshift(ann);
+              appState.announcements.sort((a,b) => (Number(b.id)||0) - (Number(a.id)||0));
+              saveStoredAnnouncements();
+              renderAnnouncements();
+            }
+          }
+          return;
+        }
+
+        if (msgObj.action === 'delete_announcement' && msgObj.target_id) {
+          const targetId = String(msgObj.target_id);
+          addDeletedId(targetId);
+          appState.announcements = appState.announcements.filter(a => String(a.id) !== targetId);
+          saveStoredAnnouncements();
+          renderAnnouncements();
+          return;
+        }
+
+        if (msgObj.action === 'cloud_sync' || msgObj.action === 'new_announcement') {
           syncCloudData();
           return;
         }
