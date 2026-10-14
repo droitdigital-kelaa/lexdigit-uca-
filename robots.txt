@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://salahboulafaa34-hue.github.io/lexdigit-uca-/sitemap.xml
+Sitemap: https://droitdigital-kelaa.digital/sitemap.xml

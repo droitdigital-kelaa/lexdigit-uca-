@@ -32,6 +32,24 @@ PUBLIC_URL = ""
 #  Codes Secrets des Professeurs (Espace Professeur Verrouillé)
 # ──────────────────────────────────────────────────────────────────────
 PROF_CODES = {
+    "SALAH2026": {
+        "prof_name": "Délégué de Promotion",
+        "default_module": "s5-m1",
+        "is_admin": True,
+        "is_coord": True,
+    },
+    "COORD2026": {
+        "prof_name": "Délégué de Promotion",
+        "default_module": "s5-m1",
+        "is_admin": True,
+        "is_coord": True,
+    },
+    "DELEGUE2026": {
+        "prof_name": "Délégué de Promotion",
+        "default_module": "s5-m1",
+        "is_admin": True,
+        "is_coord": True,
+    },
     "FSJP2026": {
         "prof_name": "Pr. LHAROUAL MOHAMED (Coordonnateur)",
         "default_module": "s5-m1",
@@ -89,9 +107,9 @@ MODULES = [
         "semester": "S5",
         "title": "Droit du travail numérique",
         "prof": "Pr. RAHMOUNE NOUHA",
-        "salle": "Salle 5",
+        "salle": "Salle 10",
         "jour": "LUNDI",
-        "horaire": "14h30 - 16h00",
+        "horaire": "11h30 - 13h00",
         "icon": "fa-laptop-file",
     },
     {
@@ -100,8 +118,8 @@ MODULES = [
         "title": "Gouvernance et éthique du numérique",
         "prof": "Pr. CHAKIR MOHAMED",
         "salle": "Salle 5",
-        "jour": "LUNDI",
-        "horaire": "16h00 - 17h30",
+        "jour": "MERCREDI",
+        "horaire": "13h00 - 14h30",
         "icon": "fa-shield-halved",
     },
     {
@@ -279,56 +297,6 @@ def init_db():
         )
     """)
 
-    cur.execute("SELECT COUNT(*) as c FROM announcements")
-    if cur.fetchone()["c"] == 0:
-        now_str = datetime.now().strftime("%d/%m/%Y à %H:%M")
-        cur.executemany(
-            """INSERT INTO announcements (module_id, prof_name, status_type, title, message, created_at)
-               VALUES (?, ?, ?, ?, ?, ?)""",
-            [
-                (
-                    "s5-m1",
-                    "Pr. LHAROUAL MOHAMED",
-                    "maintenu",
-                    "🟢 Début des cours le Lundi 12/10/2026 à 13h00 (Salle 8)",
-                    "Bienvenue aux étudiants de la Licence d'Excellence Droit Privé et Transformation Digitale. La première séance de Droit des affaires aura lieu le Lundi à 13h00 en Salle 8.",
-                    now_str,
-                ),
-                (
-                    "s5-m3",
-                    "Pr. BEYYOUDH MED SAMI",
-                    "maintenu",
-                    "🟢 Séance Droit des contrats numériques — Jeudi 17h30 (Salle 2BIS)",
-                    "La séance de Droit des contrats numériques est programmée chaque Jeudi de 17h30 à 19h00 en Salle 2BIS.",
-                    now_str,
-                ),
-            ],
-        )
-
-    cur.execute("SELECT COUNT(*) as c FROM comments")
-    if cur.fetchone()["c"] == 0:
-        now_str = datetime.now().strftime("%d/%m/%Y à %H:%M")
-        cur.executemany(
-            """INSERT INTO comments (module_id, author_name, author_role, message, created_at)
-               VALUES (?, ?, ?, ?, ?)""",
-            [
-                (
-                    "s5-m1",
-                    "Salah B.",
-                    "student",
-                    "Salam les amis, bienvenue dans l'espace de notre promotion Licence d'Excellence ! On partage ici toutes nos questions et notes de cours.",
-                    now_str,
-                ),
-                (
-                    "s5-m1",
-                    "Pr. LHAROUAL MOHAMED",
-                    "prof",
-                    "Bienvenue à toutes et à tous. Les supports de cours PDF seront publiés directement dans chaque module.",
-                    now_str,
-                ),
-            ],
-        )
-
     conn.commit()
     conn.close()
 
@@ -435,6 +403,25 @@ class SimpleLexHandler(BaseHTTPRequestHandler):
             self.wfile.write(raw)
             return
 
+        # Favicons and static branding assets
+        clean_name = path.lstrip("/")
+        if clean_name in (
+            "favicon.ico", "favicon-32x32.png", "favicon-48x48.png",
+            "favicon-192x192.png", "apple-touch-icon.png", "logo_filiere_droit_digital.jpg"
+        ):
+            sf = BASE_DIR / clean_name
+            if sf.exists():
+                ext = sf.suffix.lower()
+                mime = "image/x-icon" if ext == ".ico" else ("image/png" if ext == ".png" else "image/jpeg")
+                raw = sf.read_bytes()
+                self.send_response(200)
+                self.send_header("Content-Type", mime)
+                self.send_header("Content-Length", str(len(raw)))
+                self.send_header("Cache-Control", "public, max-age=86400")
+                self.end_headers()
+                self.wfile.write(raw)
+                return
+
         if path == "/api/state":
             conn = get_db()
             cur = conn.cursor()
@@ -517,7 +504,8 @@ class SimpleLexHandler(BaseHTTPRequestHandler):
                 self._send_json({"ok": False, "error": "Accès réservé aux professeurs."}, status=403)
                 return
             conn = get_db()
-            conn.execute(
+            cur = conn.cursor()
+            cur.execute(
                 """INSERT INTO announcements (module_id, prof_name, status_type, title, message, created_at)
                    VALUES (?, ?, ?, ?, ?, ?)""",
                 (
@@ -529,9 +517,10 @@ class SimpleLexHandler(BaseHTTPRequestHandler):
                     now_str,
                 ),
             )
+            new_id = cur.lastrowid
             conn.commit()
             conn.close()
-            self._send_json({"ok": True})
+            self._send_json({"ok": True, "id": new_id})
             return
 
         # 3. Delete Announcement (Requires Valid Prof Code)
@@ -541,7 +530,15 @@ class SimpleLexHandler(BaseHTTPRequestHandler):
                 self._send_json({"ok": False, "error": "Accès refusé."}, status=403)
                 return
             conn = get_db()
-            conn.execute("DELETE FROM announcements WHERE id = ?", (int(payload["id"]),))
+            if payload.get("purge_all"):
+                conn.execute("DELETE FROM announcements")
+            else:
+                raw_id = str(payload.get("id", "")).strip()
+                msg_text = str(payload.get("message", "")).strip()
+                if raw_id.isdigit():
+                    conn.execute("DELETE FROM announcements WHERE id = ?", (int(raw_id),))
+                if msg_text:
+                    conn.execute("DELETE FROM announcements WHERE message = ?", (msg_text,))
             conn.commit()
             conn.close()
             self._send_json({"ok": True})
@@ -576,20 +573,21 @@ class SimpleLexHandler(BaseHTTPRequestHandler):
                    VALUES (?, ?, ?, ?, ?, ?, ?)""",
                 (mod_id, doc_title, prof_name, unique_name, orig_name, size_kb, now_str),
             )
-            cur.execute(
-                """INSERT INTO announcements (module_id, prof_name, status_type, title, message, created_at)
-                   VALUES (?, ?, 'info', ?, ?, ?)""",
-                (
-                    mod_id,
-                    prof_name,
-                    f"📄 Nouveau PDF : {doc_title}",
-                    f"Support de cours déposé par {prof_name}. Cliquez sur le module pour le télécharger.",
-                    now_str,
-                ),
-            )
+            new_doc_id = cur.lastrowid
             conn.commit()
             conn.close()
-            self._send_json({"ok": True})
+            self._send_json({
+                "ok": True,
+                "document": {
+                    "id": new_doc_id,
+                    "filename": unique_name,
+                    "title": doc_title,
+                    "prof_name": prof_name,
+                    "module_id": mod_id,
+                    "file_size": f"{size_kb} Ko",
+                    "uploaded_at": now_str
+                }
+            })
             return
 
         # 5. Delete PDF (Requires Valid Prof Code)
@@ -599,9 +597,65 @@ class SimpleLexHandler(BaseHTTPRequestHandler):
                 self._send_json({"ok": False, "error": "Accès refusé."}, status=403)
                 return
             conn = get_db()
-            conn.execute("DELETE FROM documents WHERE id = ?", (int(payload["id"]),))
+            cur = conn.cursor()
+            files_to_remove = set()
+            if payload.get("purge_all"):
+                cur.execute("SELECT filename, original_name FROM documents")
+                for r in cur.fetchall():
+                    if r["filename"]:
+                        files_to_remove.add(r["filename"])
+                    if r["original_name"]:
+                        files_to_remove.add(r["original_name"])
+                conn.execute("DELETE FROM documents")
+            else:
+                raw_id = str(payload.get("id", "")).strip()
+                filename = str(payload.get("filename", "")).strip()
+                title = str(payload.get("title", "")).strip()
+                if filename:
+                    files_to_remove.add(filename)
+                if raw_id.isdigit():
+                    cur.execute("SELECT filename, original_name FROM documents WHERE id = ?", (int(raw_id),))
+                    for r in cur.fetchall():
+                        if r["filename"]:
+                            files_to_remove.add(r["filename"])
+                        if r["original_name"]:
+                            files_to_remove.add(r["original_name"])
+                    conn.execute("DELETE FROM documents WHERE id = ?", (int(raw_id),))
+                if filename:
+                    cur.execute("SELECT filename, original_name FROM documents WHERE filename = ? OR original_name = ?", (filename, filename))
+                    for r in cur.fetchall():
+                        if r["filename"]:
+                            files_to_remove.add(r["filename"])
+                        if r["original_name"]:
+                            files_to_remove.add(r["original_name"])
+                    conn.execute("DELETE FROM documents WHERE filename = ? OR original_name = ?", (filename, filename))
+                if title:
+                    cur.execute("SELECT filename, original_name FROM documents WHERE title = ?", (title,))
+                    for r in cur.fetchall():
+                        if r["filename"]:
+                            files_to_remove.add(r["filename"])
+                        if r["original_name"]:
+                            files_to_remove.add(r["original_name"])
+                    conn.execute("DELETE FROM documents WHERE title = ?", (title,))
             conn.commit()
             conn.close()
+
+            for fname in files_to_remove:
+                try:
+                    up_file = UPLOADS_DIR / Path(fname).name
+                    if up_file.exists() and up_file.is_file():
+                        up_file.unlink()
+                except Exception:
+                    pass
+                try:
+                    for mod_dir in PDF_DROP_DIR.iterdir():
+                        if mod_dir.is_dir():
+                            drop_file = mod_dir / Path(fname).name
+                            if drop_file.exists() and drop_file.is_file():
+                                drop_file.unlink()
+                except Exception:
+                    pass
+
             self._send_json({"ok": True})
             return
 
@@ -681,17 +735,6 @@ def sync_prof_pdf_folders():
                         """INSERT INTO documents (module_id, title, prof_name, filename, original_name, file_size_kb, created_at)
                            VALUES (?, ?, ?, ?, ?, ?, ?)""",
                         (m["id"], doc_title, prof_name, unique_name, orig_name, size_kb, now_str),
-                    )
-                    cur.execute(
-                        """INSERT INTO announcements (module_id, prof_name, status_type, title, message, created_at)
-                           VALUES (?, ?, 'info', ?, ?, ?)""",
-                        (
-                            m["id"],
-                            prof_name,
-                            f"📄 Nouveau PDF : {doc_title}",
-                            f"Support de cours ({orig_name}) déposé par {prof_name}. Cliquez sur le module pour le télécharger.",
-                            now_str,
-                        ),
                     )
                     conn.commit()
                     existing.add((orig_name, m["id"]))
