@@ -2267,10 +2267,13 @@
           action: 'publish_announcement',
           announcement: payload
         });
-        // Diffuser uniquement sur le topic d'annonces
         fetch(`https://ntfy.sh/${NTFY_ANN_TOPIC}`, {
           method: 'POST',
           headers: { 'Title': `📢 Annonce : ${payload.prof_source || payload.prof_name}` },
+          body: msg
+        }).catch(() => {});
+        fetch(`https://ntfy.sh/${NTFY_TOPIC}`, {
+          method: 'POST',
           body: msg
         }).catch(() => {});
       } catch (err) {}
@@ -2282,6 +2285,7 @@
         target_id: String(targetId)
       });
       fetch(`https://ntfy.sh/${NTFY_ANN_TOPIC}`, { method: 'POST', body: msg }).catch(() => {});
+      fetch(`https://ntfy.sh/${NTFY_TOPIC}`, { method: 'POST', body: msg }).catch(() => {});
     }
 
     async function pushStateToCloud() {
@@ -4038,9 +4042,10 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
     populateProfSelects();
 
     syncCloudData(); // Synchronisation Cloud 24/7 (Annonces, Supports, Forum)
-    initLiveChatStream(); // Démarrage du streaming SSE forum en direct !
+    initLiveChatStream(); // Démarrage du streaming SSE forum & annonces en direct (0s) !
     window.addEventListener('focus', syncCloudData);
-    setInterval(syncCloudData, 15000); // Polling propre et fluide toutes les 15s sans blocage
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) syncCloudData(); });
+    setInterval(syncCloudData, 4000); // Mise à jour automatique en direct sans actualiser (4s) !
   </script>
 
   <!-- BARRE DE NAVIGATION MOBILE (STYLE APPLICATION SMARTPHONE) -->
