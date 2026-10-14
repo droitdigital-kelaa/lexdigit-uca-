@@ -8,6 +8,9 @@
   <meta name="keywords" content="Droit Prive et Transformation Digitale, Licence d'Excellence Droit Prive et Transformation Digitale, droit prive et transformation digitale kelaa, licence excellence kelaa, licence excellence lkelaa, droit digital kelaa, droit digital maroc, droit prive kelaa, FSJP El Kelaa des Sraghna, FSJP Kelaa, FSJPK, FSJP-Kelaa, UCA, Universite Cadi Ayyad, Universite Cadi Ayyad Marrakech, Faculté des Sciences Juridiques et Politiques El Kelaâ des Sraghna, Centre Universitaire Kelaa des Sraghna, LexDigit, LexDigit UCA, droitdigital-kelaa.digital, Pr Lharoual Mohamed, Pr Rahmoune Nouha, Pr Chakir Mohamed, Pr Boussetta Fatim Ezzahra, Pr Assemahli Soukaina, Pr Beyyoudh Med Sami, Salah Boulafaa, droit numerique maroc, cybersecurite droit maroc, droit des contrats numeriques, droit des affaires kelaa, droit du travail numerique, droit processuel, gouvernance ethique numerique, droit du commerce electronique, emploi du temps fsjp kelaa, emploi du temps licence excellence kelaa, cours droit s5 pdf, cours droit s6 pdf, polycopies droit fsjp, examens droit kelaa, القانون الخاص والتحول الرقمي, إجازة التميز القانون الخاص والتحول الرقمي, إجازة التميز قلعة السراغنة, كلية العلوم القانونية والسياسية قلعة السراغنة, جامعة القاضي عياض قلعة السراغنة, كلية قلعة السراغنة, القانون الرقمي المغرب, licence excellence droit prive marrakech" />
   <meta name="author" content="FSJP El Kelaâ des Sraghna — Université Cadi Ayyad Marrakech (Coordinateur: Pr. Lharoual Mohamed / Délégué: Salah Boulafaa)" />
   <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <link rel="canonical" href="https://droitdigital-kelaa.digital/" />
 
   <!-- FAVICONS & APPLICATION ICONS (GOOGLE / BING / APPLE MOBILE) -->
@@ -1990,7 +1993,18 @@
       { id: "s6-m7", semester: "S6", code: "S6-M7", title: "Modes alternatifs de règlement de différends (MARD)", professor: "Équipe Pédagogique FSJP", room: "S6", schedule: "Semestre 6" }
     ];
 
-    const DEFAULT_ANNOUNCEMENTS = [];
+    const DEFAULT_ANNOUNCEMENTS = [
+      {
+        id: 1792014904092,
+        prof_name: "Pr. LHAROUAL MOHAMED (Coordonnateur)",
+        prof_source: "Pr. LHAROUAL MOHAMED (Coordonnateur)",
+        module_id: "s5-m1",
+        status_type: "present",
+        date_label: "Lundi 13h00",
+        message: "Séance de Droit des affaires en salle 8",
+        created_at: "À l'instant"
+      }
+    ];
 
     const DEFAULT_DOCUMENTS = [];
 
@@ -2084,10 +2098,14 @@
         if (raw) {
           try {
             const parsed = JSON.parse(raw);
-            if (Array.isArray(parsed)) {
+            if (Array.isArray(parsed) && parsed.length > 0) {
               announcements = parsed;
+            } else {
+              announcements = [...DEFAULT_ANNOUNCEMENTS];
             }
-          } catch(e){}
+          } catch(e){
+            announcements = [...DEFAULT_ANNOUNCEMENTS];
+          }
         } else {
           announcements = [...DEFAULT_ANNOUNCEMENTS];
         }
@@ -2287,7 +2305,7 @@
 
     async function syncCloudData() {
       try {
-        const res = await fetch(CLOUD_SYNC_BIN_URL, { cache: 'no-store' });
+        const res = await fetch(CLOUD_SYNC_BIN_URL + '?cb=' + Date.now(), { cache: 'no-store' });
         if (!res.ok) return;
         const item = await res.json();
         const cloud = (item && item.data) ? item.data : item;
@@ -3131,7 +3149,7 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
       saveStoredAnnouncements();
       renderAnnouncements();
       broadcastAnnouncement(payload);
-      pushStateToCloud();
+      await pushStateToCloud();
       document.getElementById('coordMessageInput').value = '';
       updateWhatsAppPreview();
       alert("✅ L'annonce a été publiée avec succès sur la plateforme !");
@@ -3266,7 +3284,7 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
       saveStoredAnnouncements();
       renderAnnouncements();
       broadcastAnnouncement(payload);
-      pushStateToCloud();
+      await pushStateToCloud();
       const msgInp = document.getElementById('profAnnMessageInput');
       if (msgInp) msgInp.value = '';
       updateProfWhatsAppPreview();
