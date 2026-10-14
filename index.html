@@ -8,14 +8,14 @@
   <meta name="keywords" content="licence excellence kelaa, licence excellence lkelaa, droit prive kelaa, FSJP El Kelaa des Sraghna, FSJP Kelaa, UCA, Universite Cadi Ayyad, Droit Prive et Transformation Digitale, LexDigit, Licence Excellence Droit, Pr Lharoual Mohamed, Pr Rahmoune Nouha, Pr Chakir Mohamed, Pr Boussetta Fatim Ezzahra, Pr Assemahli Soukaina, Pr Beyyoudh Med Sami, droit numerique maroc, cybersecurite droit maroc, droit des contrats numeriques, droit des affaires kelaa, droit du travail numerique, droit processuel, gouvernance ethique numerique, emploi du temps fsjp kelaa, cours droit prive s5, cours droit s6, masters droit maroc, barreau magistrature maroc, licence kelaa sraghna droit" />
   <meta name="author" content="FSJP El Kelaâ des Sraghna — Université Cadi Ayyad Marrakech" />
   <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
-  <link rel="canonical" href="https://salahboulafaa34-hue.github.io/lexdigit-uca-/" />
+  <link rel="canonical" href="https://droitdigital-kelaa.digital/" />
 
   <!-- Réseaux Sociaux & OpenGraph (WhatsApp, Facebook, LinkedIn) -->
   <meta property="og:locale" content="fr_MA" />
   <meta property="og:type" content="website" />
   <meta property="og:title" content="Licence d'Excellence Droit Privé & Transformation Digitale — FSJP El Kelaâ (UCA)" />
   <meta property="og:description" content="Accédez aux cours, emplois du temps officiels S5/S6 et supports PDF de la Licence d'Excellence Droit Privé et Transformation Digitale - FSJP El Kelaâ." />
-  <meta property="og:url" content="https://salahboulafaa34-hue.github.io/lexdigit-uca-/" />
+  <meta property="og:url" content="https://droitdigital-kelaa.digital/" />
   <meta property="og:site_name" content="LexDigit FSJP El Kelaâ des Sraghna" />
 
   <!-- Twitter Card -->
@@ -50,7 +50,7 @@
       },
       {
         "@type": "EducationalOccupationalProgram",
-        "@id": "https://salahboulafaa34-hue.github.io/lexdigit-uca-/#program",
+        "@id": "https://droitdigital-kelaa.digital/#program",
         "name": "Licence d'Excellence en Droit Privé et Transformation Digitale",
         "alternateName": ["Licence Excellence Kelaa", "Droit Privé et Transformation Digitale", "LexDigit UCA"],
         "description": "Formation universitaire d'excellence visant à former des juristes spécialisés en droit privé, droit du numérique, cybersécurité, contrats électroniques et gouvernance de l'intelligence artificielle.",
@@ -82,13 +82,13 @@
             "@type": "ListItem",
             "position": 2,
             "name": "FSJP El Kelaâ des Sraghna",
-            "item": "https://salahboulafaa34-hue.github.io/lexdigit-uca-/"
+            "item": "https://droitdigital-kelaa.digital/"
           },
           {
             "@type": "ListItem",
             "position": 3,
             "name": "Licence d'Excellence Droit Privé et Transformation Digitale",
-            "item": "https://salahboulafaa34-hue.github.io/lexdigit-uca-/"
+            "item": "https://droitdigital-kelaa.digital/"
           }
         ]
       },
@@ -1120,8 +1120,59 @@
         cursor: pointer;
         transition: color 0.15s;
       }
-      .mob-nav-item.active, .mob-nav-item:active {
+      .mob-nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: #64748b;
+        text-decoration: none;
+        font-size: 11.5px;
+        font-weight: 700;
+        padding: 6px 14px;
+        border: none;
+        background: none;
+        cursor: pointer;
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        border-radius: 12px;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .mob-nav-item:active {
+        transform: scale(0.92);
+      }
+      .mob-nav-item.active {
         color: var(--primary);
+        font-weight: 800;
+        background: rgba(30, 64, 175, 0.09);
+      }
+      .mob-nav-item.active .mob-nav-icon {
+        transform: scale(1.22);
+        filter: drop-shadow(0 2px 6px rgba(30, 64, 175, 0.35));
+      }
+      .box {
+        scroll-margin-top: 90px;
+      }
+      @media (max-width: 768px) {
+        .box {
+          scroll-margin-top: 85px;
+        }
+      }
+      @keyframes navTargetPulse {
+        0% {
+          box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.55);
+          transform: scale(1);
+        }
+        35% {
+          box-shadow: 0 0 0 6px rgba(37, 99, 235, 0.25);
+          transform: scale(1.01);
+        }
+        100% {
+          box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+          transform: scale(1);
+        }
+      }
+      .box.nav-target-pulse {
+        animation: navTargetPulse 1.2s ease-out;
       }
       .mob-nav-icon {
         font-size: 17px;
@@ -2670,7 +2721,7 @@
 📝 *Détails / Consigne :*
 ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
 ────────────────────────
-🌐 *Plateforme Officielle :* https://salahboulafaa34-hue.github.io/lexdigit-uca-/`;
+🌐 *Plateforme Officielle :* https://droitdigital-kelaa.digital/`;
 
       const out = document.getElementById('profWhatsappOutput');
       if (out) out.value = waText;
@@ -2867,7 +2918,7 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
 ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
 ────────────────────────
 👑 *Délégué de la Promotion :* Coordination des Étudiants
-🌐 *Plateforme Officielle :* https://salahboulafaa34-hue.github.io/lexdigit-uca-/`;
+🌐 *Plateforme Officielle :* https://droitdigital-kelaa.digital/`;
 
       const out = document.getElementById('whatsappOutput');
       if (out) out.value = waText;
@@ -3706,21 +3757,87 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
       try { localStorage.removeItem('lexdigit_theme'); } catch(e){}
     }
 
-    function mobileNavTo(sectionId) {
+    function smoothScrollToSection(id, pulse = true) {
+      const el = document.getElementById(id);
+      if (!el) return;
+
+      const header = document.querySelector('header');
+      const headerHeight = header ? header.offsetHeight : 75;
+      const elementPosition = el.getBoundingClientRect().top + window.pageYOffset;
+      const offsetPosition = Math.max(0, elementPosition - headerHeight - 12);
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      });
+
+      if (pulse) {
+        el.classList.remove('nav-target-pulse');
+        void el.offsetWidth;
+        el.classList.add('nav-target-pulse');
+        setTimeout(() => el.classList.remove('nav-target-pulse'), 1300);
+      }
+    }
+
+    function mobileNavTo(sectionId, btnElement) {
+      // 1. Mise à jour de l'onglet actif dans la barre mobile
+      document.querySelectorAll('.mob-nav-item').forEach(b => b.classList.remove('active'));
+      if (btnElement) {
+        btnElement.classList.add('active');
+      }
+
+      // 2. Gestion de l'Emploi du temps
       if (sectionId === 'timetableSection') {
         switchView('TT');
-        const el = document.getElementById('timetableWrap');
-        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        setTimeout(() => {
+          smoothScrollToSection('modulesSection', true);
+        }, 80);
         return;
       }
+
+      // 3. Gestion des Modules
       if (sectionId === 'modulesSection') {
         if (currentTab === 'TT') switchView('S5');
-        const el = document.getElementById('modulesGrid');
-        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        setTimeout(() => {
+          smoothScrollToSection('modulesSection', true);
+        }, 80);
         return;
       }
-      const el = document.getElementById(sectionId);
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      // 4. Gestion des Annonces ou Forum
+      smoothScrollToSection(sectionId, true);
+    }
+
+    // ScrollSpy automatique pour surligner l'onglet actif au défilement
+    function initMobileScrollSpy() {
+      const navMap = [
+        { sectionId: 'announcementsSection', btnId: 'mobNavAnn' },
+        { sectionId: 'modulesSection', btnId: 'mobNavMod' },
+        { sectionId: 'forumSection', btnId: 'mobNavForum' }
+      ];
+
+      window.addEventListener('scroll', () => {
+        const headerHeight = (document.querySelector('header')?.offsetHeight || 75) + 25;
+        const scrollPos = window.pageYOffset + headerHeight;
+
+        let currentActive = null;
+        for (const item of navMap) {
+          const el = document.getElementById(item.sectionId);
+          if (el) {
+            const top = el.offsetTop;
+            const bottom = top + el.offsetHeight;
+            if (scrollPos >= top - 20 && scrollPos < bottom) {
+              currentActive = (currentTab === 'TT' && item.sectionId === 'modulesSection') ? 'mobNavTT' : item.btnId;
+            }
+          }
+        }
+
+        if (currentActive) {
+          document.querySelectorAll('.mob-nav-item').forEach(b => {
+            b.classList.toggle('active', b.id === currentActive);
+          });
+        }
+      }, { passive: true });
     }
 
     function restoreSavedSessions() {
@@ -3762,6 +3879,7 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
 
     // Initialisations au chargement
     initTheme();
+    initMobileScrollSpy();
     restoreSavedSessions();
     loadStoredAnnouncements();
     loadStoredComments();
@@ -3784,19 +3902,19 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
 
   <!-- BARRE DE NAVIGATION MOBILE (STYLE APPLICATION SMARTPHONE) -->
   <nav class="mobile-bottom-nav">
-    <button class="mob-nav-item" onclick="mobileNavTo('announcementsSection')">
+    <button class="mob-nav-item active" id="mobNavAnn" onclick="mobileNavTo('announcementsSection', this)">
       <span class="mob-nav-icon">📢</span>
       <span>Annonces</span>
     </button>
-    <button class="mob-nav-item" onclick="mobileNavTo('modulesSection')">
+    <button class="mob-nav-item" id="mobNavMod" onclick="mobileNavTo('modulesSection', this)">
       <span class="mob-nav-icon">📚</span>
       <span>Modules</span>
     </button>
-    <button class="mob-nav-item" onclick="mobileNavTo('timetableSection')">
+    <button class="mob-nav-item" id="mobNavTT" onclick="mobileNavTo('timetableSection', this)">
       <span class="mob-nav-icon">🗓️</span>
       <span>Emploi</span>
     </button>
-    <button class="mob-nav-item" onclick="mobileNavTo('forumSection')">
+    <button class="mob-nav-item" id="mobNavForum" onclick="mobileNavTo('forumSection', this)">
       <span class="mob-nav-icon">💬</span>
       <span>Forum</span>
     </button>
