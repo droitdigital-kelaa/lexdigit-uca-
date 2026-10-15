@@ -2035,7 +2035,6 @@
     let forumFilter = 'ALL';
     const NTFY_TOPIC = 'lexdigit_uca_sraghna_forum_2026';
     const NTFY_ANN_TOPIC = 'lexdigit_uca_sraghna_announcements_2026';
-    const CLOUD_SYNC_BIN_URL = 'https://api.restful-api.dev/objects/ff808181a09d98f701a13c3239cb6230';
     let profSession = null;
     let coordSession = null;
 
@@ -2267,158 +2266,103 @@
           action: 'publish_announcement',
           announcement: payload
         });
-        fetch(`https://ntfy.sh/${NTFY_ANN_TOPIC}`, {
-          method: 'POST',
-          headers: { 'Title': `📢 Annonce : ${payload.prof_source || payload.prof_name}` },
-          body: msg
-        }).catch(() => {});
-        fetch(`https://ntfy.sh/${NTFY_TOPIC}`, {
-          method: 'POST',
-          body: msg
-        }).catch(() => {});
-      } catch (err) {}
+        await Promise.allSettled([
+          fetch(`https://ntfy.sh/${NTFY_ANN_TOPIC}`, {
+            method: 'POST',
+            body: msg
+          }),
+          fetch(`https://ntfy.sh/${NTFY_TOPIC}`, {
+            method: 'POST',
+            body: msg
+          })
+        ]);
+      } catch (err) {
+        console.warn('Broadcast announcement error:', err);
+      }
     }
 
     function broadcastDeleteAnnouncement(targetId) {
-      const msg = JSON.stringify({
-        action: 'delete_announcement',
-        target_id: String(targetId)
-      });
-      fetch(`https://ntfy.sh/${NTFY_ANN_TOPIC}`, { method: 'POST', body: msg }).catch(() => {});
-      fetch(`https://ntfy.sh/${NTFY_TOPIC}`, { method: 'POST', body: msg }).catch(() => {});
+      try {
+        const msg = JSON.stringify({
+          action: 'delete_announcement',
+          target_id: String(targetId)
+        });
+        fetch(`https://ntfy.sh/${NTFY_ANN_TOPIC}`, { method: 'POST', body: msg }).catch(() => {});
+        fetch(`https://ntfy.sh/${NTFY_TOPIC}`, { method: 'POST', body: msg }).catch(() => {});
+      } catch(err) {}
     }
 
     async function pushStateToCloud() {
       try {
-        const payload = {
-          name: "lexdigit_main_database",
-          data: {
+        await fetch('/api/sync', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
             announcements: appState.announcements,
             documents: appState.documents,
-            comments: appState.comments.filter(c => c && c.author && c.message && !c.action),
-            last_updated: new Date().toISOString()
-          }
-        };
-        await fetch(CLOUD_SYNC_BIN_URL, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
+            comments: appState.comments.filter(c => c && c.author && c.message && !c.action)
+          })
         });
       } catch(err) {}
     }
 
     async function syncCloudData() {
       try {
-        const res = await fetch(CLOUD_SYNC_BIN_URL + '?cb=' + Date.now(), { cache: 'no-store' });
-        if (!res.ok) return;
-        const item = await res.json();
-        const cloud = (item && item.data) ? item.data : item;
-        if (!cloud) return;
+        // 1. Récupération de l'historique récent depuis le cache ntfy.sh (Annonces & Forum)
+        const [annRes, forumRes] = await Promise.allSettled([
+          fetch(`https://ntfy.sh/${NTFY_ANN_TOPIC}/json?poll=1`, { cache: 'no-store' }),
+          fetch(`https://ntfy.sh/${NTFY_TOPIC}/json?poll=1`, { cache: 'no-store' })
+        ]);
 
-        let needPush = false;
-
-        // 1. SYNCHRONISATION DES ANNONCES PROFESSEURS & DÉLÉGUÉ
-        if (Array.isArray(cloud.announcements)) {
-          const deletedIds = new Set(getDeletedIds().map(String));
-          const map = new Map();
-
-          // Charger les annonces existantes dans le Cloud
-          cloud.announcements.forEach(a => {
-            const sid = String(a.id);
-            if (!deletedIds.has(sid) && !LEGACY_DEMO_ANN_IDS.has(sid)) {
-              map.set(sid, a);
-            }
-          });
-
-          // Fusionner les annonces locales (ex: si le prof en a une dans son navigateur non encore envoyée)
-          appState.announcements.forEach(a => {
-            const sid = String(a.id);
-            if (!deletedIds.has(sid) && !LEGACY_DEMO_ANN_IDS.has(sid)) {
-              if (!map.has(sid)) {
-                map.set(sid, a);
-                needPush = true;
+        if (annRes.status === 'fulfilled' && annRes.value && annRes.value.ok) {
+          const text = await annRes.value.text();
+          const lines = text.trim().split('\n');
+          for (const line of lines) {
+            if (!line.trim()) continue;
+            try {
+              const item = JSON.parse(line);
+              if (item && item.message) {
+                handleIncomingLiveComment(item.message, item.id);
               }
-            }
-          });
-
-          const mergedAnn = Array.from(map.values()).sort((a,b) => (Number(b.id)||0) - (Number(a.id)||0));
-          if (JSON.stringify(mergedAnn) !== JSON.stringify(appState.announcements)) {
-            appState.announcements = mergedAnn;
-            saveStoredAnnouncements();
-            renderAnnouncements();
+            } catch(e){}
           }
         }
 
-        // 2. SYNCHRONISATION DES DOCUMENTS PDF
-        if (Array.isArray(cloud.documents)) {
-          const deletedDocIds = new Set(getDeletedDocIds().map(String));
-          const docMap = new Map();
-
-          cloud.documents.forEach(d => {
-            const sid = String(d.id);
-            if (deletedDocIds.has(sid) || LEGACY_DEMO_DOC_IDS.has(sid)) return;
-            if (d.filename && deletedDocIds.has(String(d.filename))) return;
-            if (d.title && deletedDocIds.has('title:' + String(d.title))) return;
-            docMap.set(sid, d);
-          });
-
-          appState.documents.forEach(d => {
-            const sid = String(d.id);
-            if (deletedDocIds.has(sid) || LEGACY_DEMO_DOC_IDS.has(sid)) return;
-            if (d.filename && deletedDocIds.has(String(d.filename))) return;
-            if (d.title && deletedDocIds.has('title:' + String(d.title))) return;
-            if (!docMap.has(sid)) {
-              docMap.set(sid, d);
-              needPush = true;
-            }
-          });
-
-          const mergedDocs = Array.from(docMap.values());
-          if (JSON.stringify(mergedDocs) !== JSON.stringify(appState.documents)) {
-            appState.documents = mergedDocs;
-            saveStoredDocuments();
-            renderSelectedModuleDocs();
-            renderModules();
+        if (forumRes.status === 'fulfilled' && forumRes.value && forumRes.value.ok) {
+          const text = await forumRes.value.text();
+          const lines = text.trim().split('\n');
+          for (const line of lines) {
+            if (!line.trim()) continue;
+            try {
+              const item = JSON.parse(line);
+              if (item && item.message) {
+                handleIncomingLiveComment(item.message, item.id);
+              }
+            } catch(e){}
           }
         }
 
-        // 3. SYNCHRONISATION DU FORUM (COMMENTAIRES ÉTUDIANTS SANS FANTÔMES)
-        if (Array.isArray(cloud.comments)) {
-          const deletedCommentIds = getDeletedCommentIds();
-          const commMap = new Map();
-
-          cloud.comments.forEach(c => {
-            if (c && c.author && c.message && !c.action) {
-              const sid = String(c.id);
-              if (!deletedCommentIds.has(sid) && !LEGACY_DEMO_COMM_IDS.has(sid)) {
-                commMap.set(sid, c);
-              }
-            }
-          });
-
-          appState.comments.forEach(c => {
-            if (c && c.author && c.message && !c.action) {
-              const sid = String(c.id);
-              if (!deletedCommentIds.has(sid) && !LEGACY_DEMO_COMM_IDS.has(sid)) {
-                if (!commMap.has(sid)) {
-                  commMap.set(sid, c);
-                  needPush = true;
+        // 2. Si le backend local Python est actif (server.py)
+        try {
+          const localRes = await fetch('/api/announcements', { cache: 'no-store' });
+          if (localRes.ok) {
+            const data = await localRes.json();
+            if (Array.isArray(data)) {
+              const deletedIds = new Set(getDeletedIds().map(String));
+              data.forEach(a => {
+                const sid = String(a.id);
+                if (!deletedIds.has(sid) && !LEGACY_DEMO_ANN_IDS.has(sid)) {
+                  if (!appState.announcements.some(x => String(x.id) === sid)) {
+                    appState.announcements.unshift(a);
+                  }
                 }
-              }
+              });
+              appState.announcements.sort((a,b) => (Number(b.id)||0) - (Number(a.id)||0));
+              saveStoredAnnouncements();
+              renderAnnouncements();
             }
-          });
-
-          const mergedComments = Array.from(commMap.values());
-          if (JSON.stringify(mergedComments) !== JSON.stringify(appState.comments)) {
-            appState.comments = mergedComments;
-            saveStoredComments();
-            renderForumComments(false);
           }
-        }
-
-        if (needPush) {
-          pushStateToCloud();
-        }
+        } catch(e){}
       } catch(err) {}
     }
 
@@ -2997,7 +2941,8 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
       btn.classList.add('unlocked');
       btn.textContent = `👑 Espace Déléguée (Connectée)`;
 
-      document.getElementById('coordWelcomeName').textContent = coordSession.name;
+      const nameEl = document.getElementById('coordWelcomeName');
+      if (nameEl) nameEl.textContent = coordSession.name;
       document.getElementById('coordPanel').style.display = 'block';
 
       populateCoordSelects();
@@ -4041,11 +3986,11 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
     renderForumComments(false);
     populateProfSelects();
 
-    syncCloudData(); // Synchronisation Cloud 24/7 (Annonces, Supports, Forum)
+    syncCloudData(); // Synchronisation initiale depuis le cache ntfy.sh
     initLiveChatStream(); // Démarrage du streaming SSE forum & annonces en direct (0s) !
     window.addEventListener('focus', syncCloudData);
     document.addEventListener('visibilitychange', () => { if (!document.hidden) syncCloudData(); });
-    setInterval(syncCloudData, 4000); // Mise à jour automatique en direct sans actualiser (4s) !
+    setInterval(syncCloudData, 45000); // Filet de sécurité toutes les 45s (le live est assuré à 100% par le SSE 0s)
   </script>
 
   <!-- BARRE DE NAVIGATION MOBILE (STYLE APPLICATION SMARTPHONE) -->
