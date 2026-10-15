@@ -1995,14 +1995,24 @@
 
     const DEFAULT_ANNOUNCEMENTS = [
       {
-        id: 1792014904092,
+        id: 1,
         prof_name: "Pr. LHAROUAL MOHAMED (Coordonnateur)",
         prof_source: "Pr. LHAROUAL MOHAMED (Coordonnateur)",
         module_id: "s5-m1",
         status_type: "present",
-        date_label: "Lundi 13h00",
+        date_label: "Lundi 13h00 - Salle 8",
         message: "Séance de Droit des affaires en salle 8",
-        created_at: "À l'instant"
+        created_at: "Séance confirmée"
+      },
+      {
+        id: 2,
+        prof_name: "Pr. BEYYOUDH MED SAMI",
+        prof_source: "Pr. BEYYOUDH MED SAMI",
+        module_id: "s5-m3",
+        status_type: "present",
+        date_label: "Jeudi 17h30 - Salle 2BIS",
+        message: "Séance de Droit des contrats numériques en salle 2BIS",
+        created_at: "Séance confirmée"
       }
     ];
 
@@ -2038,8 +2048,8 @@
     let profSession = null;
     let coordSession = null;
 
-    const LEGACY_DEMO_ANN_IDS = new Set(['1', '2', '100']);
-    const LEGACY_DEMO_COMM_IDS = new Set(['c1', 'c2', 'c3', 'c4', '1', '2']);
+    const LEGACY_DEMO_ANN_IDS = new Set();
+    const LEGACY_DEMO_COMM_IDS = new Set(['c1', 'c2', 'c3', 'c4']);
     const LEGACY_DEMO_DOC_IDS = new Set(['doc_syllabus_s5']);
 
     function getDeletedIds() {
@@ -2090,7 +2100,6 @@
 
     function loadStoredAnnouncements() {
       try {
-        const deletedIds = new Set(getDeletedIds().map(String));
         const raw = localStorage.getItem('lexdigit_announcements');
         let announcements = [];
 
@@ -2109,16 +2118,21 @@
           announcements = [...DEFAULT_ANNOUNCEMENTS];
         }
 
-        // Filtrer les annonces supprimées ainsi que les anciennes annonces par défaut
+        // Garder les annonces valides
         appState.announcements = announcements.filter(a => {
-          const sid = String(a.id);
-          if (deletedIds.has(sid) || LEGACY_DEMO_ANN_IDS.has(sid)) return false;
+          if (!a || !a.message) return false;
           if (a.title && String(a.title).startsWith('📄 Nouveau PDF :')) return false;
           if (a.date_label && String(a.date_label).startsWith('📄 Nouveau PDF :')) return false;
           return true;
         });
+
+        if (!appState.announcements || appState.announcements.length === 0) {
+          appState.announcements = [...DEFAULT_ANNOUNCEMENTS];
+        }
         saveStoredAnnouncements();
-      } catch(e) {}
+      } catch(e) {
+        appState.announcements = [...DEFAULT_ANNOUNCEMENTS];
+      }
     }
 
     function saveStoredComments() {
@@ -2210,22 +2224,18 @@
           if (data && data.modules && data.modules.length) {
             appState.modules = data.modules;
             if (Array.isArray(data.announcements)) {
-              const deletedIds = new Set(getDeletedIds().map(String));
               const map = new Map();
               data.announcements.forEach(a => {
                 const sid = String(a.id);
-                if (deletedIds.has(sid) || LEGACY_DEMO_ANN_IDS.has(sid)) return;
                 if (a.title && String(a.title).startsWith('📄 Nouveau PDF :')) return;
                 if (a.date_label && String(a.date_label).startsWith('📄 Nouveau PDF :')) return;
                 map.set(sid, a);
               });
-              appState.announcements.forEach(a => {
-                const sid = String(a.id);
-                if (!deletedIds.has(sid) && !LEGACY_DEMO_ANN_IDS.has(sid) && !map.has(sid)) {
-                  map.set(sid, a);
-                }
-              });
-              appState.announcements = Array.from(map.values());
+              if (map.size > 0) {
+                appState.announcements = Array.from(map.values());
+              } else if (!appState.announcements || appState.announcements.length === 0) {
+                appState.announcements = [...DEFAULT_ANNOUNCEMENTS];
+              }
               saveStoredAnnouncements();
             }
             if (Array.isArray(data.documents)) {
@@ -2347,14 +2357,11 @@
           const localRes = await fetch('/api/announcements', { cache: 'no-store' });
           if (localRes.ok) {
             const data = await localRes.json();
-            if (Array.isArray(data)) {
-              const deletedIds = new Set(getDeletedIds().map(String));
+            if (Array.isArray(data) && data.length > 0) {
               data.forEach(a => {
                 const sid = String(a.id);
-                if (!deletedIds.has(sid) && !LEGACY_DEMO_ANN_IDS.has(sid)) {
-                  if (!appState.announcements.some(x => String(x.id) === sid)) {
-                    appState.announcements.unshift(a);
-                  }
+                if (!appState.announcements.some(x => String(x.id) === sid)) {
+                  appState.announcements.unshift(a);
                 }
               });
               appState.announcements.sort((a,b) => (Number(b.id)||0) - (Number(a.id)||0));
@@ -2401,6 +2408,11 @@
 
     function renderAnnouncements() {
       const container = document.getElementById('announcementsList');
+      if (!appState.announcements || !appState.announcements.length) {
+        if (DEFAULT_ANNOUNCEMENTS && DEFAULT_ANNOUNCEMENTS.length) {
+          appState.announcements = [...DEFAULT_ANNOUNCEMENTS];
+        }
+      }
       if (!appState.announcements.length) {
         container.innerHTML = `<div style="color:var(--muted);font-size:13.5px;padding:12px 0;">Aucune annonce pour le moment.</div>`;
       } else {
