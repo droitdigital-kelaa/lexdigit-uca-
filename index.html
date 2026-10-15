@@ -1232,7 +1232,7 @@
       </div>
       <div class="header-actions">
         <button id="coordAccessBtn" class="coord-btn" onclick="handleCoordButtonClick()">
-          👑 Espace Délégué
+          👑 Espace Déléguée
         </button>
         <button id="profAccessBtn" class="prof-btn" onclick="handleProfButtonClick()">
           🔒 Accès Professeur
@@ -1243,12 +1243,12 @@
 
   <div class="container">
 
-    <!-- COORDINATOR PROTECTED PANEL (Délégué de la Promotion) -->
+    <!-- COORDINATOR PROTECTED PANEL (Déléguée de la Promotion) -->
     <div id="coordPanel" class="box" style="display:none;border:2px solid #d97706;background:#fffbeb;box-shadow:0 4px 15px rgba(217,119,6,0.12);">
       <div class="box-header">
         <div>
           <div class="box-title" style="color:#b45309;font-size:18px;">
-            👑 Espace Délégué & Coordination de la Promotion
+            👑 Espace Déléguée & Coordination de la Promotion
           </div>
           <p style="font-size:12.5px;color:#78350f;margin-top:2px;">
             Espace officiel pour diffuser aux étudiants les consignes transmises par les professeurs (Cours maintenu, absence, rattrapage, changement de salle).
@@ -1261,7 +1261,7 @@
       </div>
 
       <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(320px, 1fr));gap:16px;">
-        <!-- Formulaire de Publication Délégué -->
+        <!-- Formulaire de Publication Déléguée -->
         <div class="sub-panel" style="background:white;padding:16px;border-radius:10px;border:1px solid #fde68a;">
           <h3 style="font-size:15px;color:#92400e;margin-bottom:12px;">📢 Diffuser une Annonce Officielle</h3>
           <form onsubmit="submitCoordAnnouncement(event)">
@@ -1274,7 +1274,7 @@
               <option value="Pr. ASSEMAHLI SOUKAINA" data-module="s5-m2" data-schedule="Jeudi à 16h00 (Salle 2BIS)">Pr. ASSEMAHLI SOUKAINA (Droit processuel)</option>
               <option value="Pr. BEYYOUDH MED SAMI" data-module="s5-m3" data-schedule="Jeudi à 17h30 (Salle 2BIS)">Pr. BEYYOUDH MED SAMI (Droit des contrats numériques)</option>
               <option value="Administration FSJP El Kelaâ" data-module="ALL" data-schedule="Avis Administratif">Administration FSJP El Kelaâ</option>
-              <option value="Délégué de Promotion" data-module="ALL" data-schedule="Avis Général Promo">Coordination de la Promotion (Délégué)</option>
+              <option value="Déléguée de Promotion" data-module="ALL" data-schedule="Avis Général Promo">Coordination de la Promotion (Déléguée)</option>
             </select>
 
             <label style="font-size:12px;font-weight:700;color:#475569;display:block;margin-bottom:4px;">2. Module / Matière concernée :</label>
@@ -2481,7 +2481,7 @@
             : '';
 
           const coordBadge = a.is_coord
-            ? `<span class="badge" style="background:#fef3c7;color:#92400e;border:1px solid #f59e0b;">👑 Avis Délégué de Promotion</span>`
+            ? `<span class="badge" style="background:#fef3c7;color:#92400e;border:1px solid #f59e0b;">👑 Avis Déléguée de Promotion</span>`
             : '';
 
           const sourceText = a.prof_source
@@ -2686,7 +2686,7 @@
           let itemClass = '';
           
           if (isCoord) {
-            roleBadge = '<span style="font-size:11px;background:#fef3c7;color:#92400e;border:1px solid #f59e0b;padding:2px 6px;border-radius:4px;font-weight:700;">👑 Délégué Promo</span>';
+            roleBadge = '<span style="font-size:11px;background:#fef3c7;color:#92400e;border:1px solid #f59e0b;padding:2px 6px;border-radius:4px;font-weight:700;">👑 Déléguée Promo</span>';
             avatarClass = 'coord';
             itemClass = 'coord-comment';
           } else if (isProf) {
@@ -2987,7 +2987,7 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
       document.getElementById('coordLoginError').style.display = 'none';
       coordSession = {
         code: code,
-        name: data.prof_name || "Délégué de la Promotion",
+        name: data.prof_name || "Déléguée de la Promotion",
         role: "coordinator"
       };
       try { localStorage.setItem('lexdigit_coord_session', JSON.stringify(coordSession)); } catch(e){}
@@ -2995,7 +2995,7 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
 
       const btn = document.getElementById('coordAccessBtn');
       btn.classList.add('unlocked');
-      btn.textContent = `👑 Espace Délégué (Connecté)`;
+      btn.textContent = `👑 Espace Déléguée (Connectée)`;
 
       document.getElementById('coordWelcomeName').textContent = coordSession.name;
       document.getElementById('coordPanel').style.display = 'block';
@@ -3012,7 +3012,7 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
       document.getElementById('coordPanel').style.display = 'none';
       const btn = document.getElementById('coordAccessBtn');
       btn.classList.remove('unlocked');
-      btn.textContent = '👑 Espace Délégué';
+      btn.textContent = '👑 Espace Déléguée';
       renderAnnouncements();
       renderSelectedModuleWorkspace();
     }
@@ -3134,7 +3134,7 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
         status_type: status,
         date_label: dateVal,
         message: msgVal,
-        created_at: "Délégué de la Promotion · À l'instant"
+        created_at: "Déléguée de la Promotion · À l'instant"
       };
 
       try {
@@ -3752,7 +3752,7 @@ ${msgVal || '(Écrivez votre message pour qu\'il apparaisse ici...)'}
       const inp = document.getElementById('commentAuthor');
       if (!inp) return;
       if (coordSession) {
-        inp.value = 'Délégué de Promotion';
+        inp.value = 'Déléguée de Promotion';
         inp.readOnly = true;
       } else if (profSession) {
         inp.value = profSession.prof_name;
